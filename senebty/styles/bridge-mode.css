@@ -1,0 +1,112 @@
+/* Bridge Mode — Phase 1
+ * Soft Seba-elder card register (NOT Heka register — Cultural Consensus binding).
+ * Heka visuals reserved for tier-modal + Power Word recitation.
+ */
+
+/* ─── Affordance (𓋹 ankh + "A whisper from Seba") ─── */
+.bridge-affordance {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 10px 16px;
+  min-height: 44px;
+  min-width: 44px;
+  background: rgba(196, 163, 71, 0.08);
+  border: 1px solid rgba(196, 163, 71, 0.3);
+  border-radius: 24px;
+  color: var(--gold-bright, #FFD166);
+  font-family: var(--font-body, system-ui), serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 200ms ease, border-color 200ms ease;
+}
+.bridge-affordance:hover { background: rgba(196,163,71,0.16); border-color: rgba(196,163,71,0.5); }
+.bridge-affordance:focus-visible { outline: 2px solid var(--gold-bright, #FFD166); outline-offset: 2px; }
+.bridge-affordance-glyph { font-family: 'NotoSansEgyptianHieroglyphs', sans-serif; font-size: 1.2rem; line-height: 1; }
+.bridge-affordance-label { font-style: italic; color: var(--text-secondary, #aaa); }
+
+/* ─── Overlay (Seba-elder card register) ─── */
+.bridge-hint-overlay {
+  position: relative;
+  margin: 12px 0;
+  padding: 18px 18px 14px;
+  background: linear-gradient(160deg, var(--sandstone, #F2E4CC) 0%, #f7ecd3 100%);
+  border: 1px solid var(--gold, #C4A347);
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+  color: var(--dark-chocolate, #110D08);
+  animation: bridge-hint-fade-in 220ms ease-out;
+}
+.bridge-hint-title {
+  margin: 0 0 12px 0;
+  font-family: var(--font-head, serif);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--lapis, #1a237e);
+}
+.bridge-hint-starter-list { display: flex; flex-direction: column; gap: 8px; }
+.bridge-hint-starter {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(196,163,71,0.35);
+  border-radius: 8px;
+  color: var(--dark-chocolate, #110D08);
+  font-family: var(--font-body, system-ui), serif;
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+.bridge-hint-starter:hover { background: rgba(196,163,71,0.18); border-color: var(--gold, #C4A347); }
+.bridge-hint-starter:focus-visible { outline: 2px solid var(--gold-bright, #FFD166); outline-offset: 2px; }
+.bridge-hint-close {
+  position: absolute; top: 6px; right: 8px;
+  min-width: 44px; min-height: 44px;
+  background: transparent; border: none;
+  color: var(--lapis, #1a237e);
+  font-size: 1.4rem; line-height: 1; cursor: pointer;
+}
+.bridge-hint-close:focus-visible { outline: 2px solid var(--gold-bright, #FFD166); outline-offset: 2px; }
+
+@keyframes bridge-hint-fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Reading Preferences toggle ─── */
+.parent-card.reading-prefs-card { margin-top: 18px; }
+.bridge-toggle-label {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 12px; min-height: 44px; cursor: pointer;
+}
+.bridge-toggle-input { width: 22px; height: 22px; cursor: pointer; }
+.bridge-toggle-title {
+  font-family: var(--font-head, serif); font-size: 0.95rem; font-weight: 600;
+}
+.bridge-toggle-desc { margin: 0; font-size: 0.8rem; color: var(--text-secondary, #aaa); line-height: 1.4; }
+
+/* ─── prefers-reduced-motion (Tehuti binding) ─── */
+@media (prefers-reduced-motion: reduce) {
+  .bridge-hint-overlay { animation: none !important; }
+  .bridge-affordance, .bridge-hint-starter { transition: none !important; }
+}
+
+/* ─── prefers-contrast: more (Tehuti binding) ─── */
+@media (prefers-contrast: more) {
+  .bridge-affordance {
+    background: var(--bg-card, #1a1a1a);
+    border-color: var(--gold-bright, #FFD166);
+    color: var(--gold-bright, #FFD166);
+  }
+  .bridge-hint-overlay {
+    background: var(--sandstone, #F2E4CC);
+    border-color: var(--dark-chocolate, #110D08);
+    border-width: 2px;
+  }
+  .bridge-hint-starter { border-color: var(--dark-chocolate, #110D08); background: white; }
+  .bridge-hint-title { color: var(--dark-chocolate, #110D08); }
+}

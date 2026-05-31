@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.perankh.reader",
+    "sha256_cert_fingerprints": ["75:68:D1:D4:97:47:BA:C2:D1:1E:87:15:93:A8:09:25:AE:1F:B9:62:03:65:D0:AC:97:2B:F4:57:8C:03:76:7E"]
+  }
+}]

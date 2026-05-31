@@ -1,0 +1,3128 @@
+/* senebty/styles/senebty.css
+   Section-scoped styles for Per Ankh Senebty.
+   ONLY define rules the reader's existing tokens do NOT cover.
+   Reuse: --gold (#C4A347), --lapis (#1a237e), --carnelian (#B8412B),
+          --malachite (#2E7D32), --sandstone (#F2E4CC), --dark-chocolate (#110D08),
+          --bright-gold (#FFD166).
+   All Senebty rules must be prefixed `.senebty-*` or scoped under `#senebty` to
+   avoid bleeding into other wings. */
+
+/* Phase 1.3 — self-hosted Noto Sans Egyptian Hieroglyphs (SIL OFL).
+   Ensures T2/T3 attested glyphs paint on systems without the system font
+   (Win 7/8, Android <12, Linux without noto-fonts-extra). */
+@font-face {
+  font-family: 'Noto Sans Egyptian Hieroglyphs';
+  src: url('/fonts/NotoSansEgyptianHieroglyphs.woff2?v=20260428a') format('woff2');
+  font-display: swap;
+  unicode-range: U+13000-U+1342F;
+}
+
+/* Senebty section. Ambient bg video is position:fixed so .screen's
+   padding/max-width are fine for the foreground panel. */
+#senebty {
+  background: var(--dark-chocolate);
+  color: var(--sandstone);
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Foreground panel — prominent over the ambient bg.
+   z-index: 2 so it sits above .senebty-ambient-bg (0) and scrim (0).
+   Subtle surface tint + border keeps the panel legible without
+   demanding heavy fill. */
+.senebty-gate {
+  position: relative;
+  z-index: 2;
+  max-width: 720px;
+  margin: 24px auto;
+  padding: 28px 22px 32px;
+  text-align: center;
+  background: rgba(17, 13, 8, 0.62);
+  border: 1px solid rgba(196, 163, 71, 0.35);
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+.senebty-gate__ankh {
+  display: block;
+  font-size: clamp(56px, 9vw, 96px);
+  color: var(--bright-gold);
+  line-height: 1;
+  margin-bottom: 4px;
+  text-shadow: 0 0 40px rgba(255, 209, 102, 0.35);
+}
+.senebty-gate__brand {
+  font-family: var(--font-display, 'Cinzel', serif);
+  font-size: clamp(1.6rem, 4.5vw, 2.6rem);
+  color: var(--bright-gold);
+  letter-spacing: 0.06em;
+  margin: 6px 0 4px;
+}
+.senebty-gate__sub {
+  font-family: var(--font-display, 'Cinzel', serif);
+  font-size: clamp(0.78rem, 1.6vw, 0.95rem);
+  color: var(--text-secondary, #d8c89a);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin: 0 0 14px;
+  opacity: 0.95;
+}
+
+.senebty-gate__title {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  color: var(--gold);
+  margin: 0.5rem 0 1rem;
+  letter-spacing: 0.04em;
+}
+
+.senebty-gate__seba {
+  font-size: clamp(1rem, 2.4vw, 1.2rem);
+  color: var(--bright-gold);
+  line-height: 1.6;
+  margin: 14px 0 18px;
+  font-style: italic;
+}
+
+.senebty-tier-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  font-size: 0.95rem;
+}
+
+.senebty-tier-badge__glyph {
+  font-size: 1.4rem;
+  line-height: 1;
+  white-space: nowrap;
+  max-width: 50px;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+/* Phase 1.3 — sigil thumbnails for tiers without attested mdw nṯr.
+   Render targets: 32×32 for badge, 88×88 for advancement modal. */
+.senebty-tier-sigil {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: 4px;
+  vertical-align: middle;
+  background: transparent;
+}
+
+.senebty-tier-modal__sigil {
+  display: inline-block;
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+  border-radius: 8px;
+  /* Coach v3.51.27: gold-tinted placeholder prevents layout shift while PNG loads. */
+  background: rgba(196, 163, 71, 0.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .senebty-tier-sigil,
+  .senebty-tier-modal__sigil {
+    animation: none;
+    transition: none;
+  }
+}
+
+.senebty-rings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.senebty-ring {
+  border: 1px solid var(--gold);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  background: rgba(196, 163, 71, 0.08);
+  cursor: pointer;
+  transition: background 180ms ease, transform 180ms ease, border-color 180ms ease;
+}
+.senebty-ring:hover,
+.senebty-ring:focus-visible {
+  background: rgba(196, 163, 71, 0.16);
+  border-color: var(--bright-gold);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.senebty-ring--locked {
+  opacity: 0.5;
+  /* Visible-but-dim per UX verdict; never display:none.
+     Still clickable — Seba modal explains the gate. */
+}
+
+.senebty-ring__title { color: var(--gold); margin: 0 0 0.5rem; }
+.senebty-ring__desc { color: var(--sandstone); font-size: 0.9rem; line-height: 1.5; margin: 0 0 0.5rem; }
+.senebty-ring__lock { color: var(--bright-gold); font-style: italic; font-size: 0.85rem; }
+
+/* ─── Khaemwaset Threshold entry-panel (v3.48.6 — adversarial-RT consensus fix) ───
+   Sister-panel to .senebty-ring but elevated: full-width, pale-lapis-silver
+   series-accent (visual-identity §2), the front-door panel of the wing.
+   RT top-5: PM+ArtDir+Karenga+Hilliard (panel framing parity),
+             Mahlangu (pale-lapis-silver #A8B8CC accent, not gold),
+             Marshall+Karenga+Biggers (full-width, heavier gravity, primary CTA),
+             Hilliard+PM (Begin CTA = primary not secondary),
+             Maya (aria-labelledby + focus-visible parity with .senebty-ring). */
+.senebty-threshold-entry {
+  display: block;
+  width: 100%;
+  margin: 2rem 0 1rem;
+  padding: 1.5rem 1.25rem;
+  border: 1px solid #A8B8CC;
+  border-radius: 0.75rem;
+  background: rgba(168, 184, 204, 0.10);
+  box-shadow: 0 2px 12px rgba(168, 184, 204, 0.08);
+  text-align: center;
+}
+.senebty-threshold-entry__title {
+  color: #A8B8CC;
+  font-size: 1.4rem;
+  margin: 0 0 0.5rem;
+  letter-spacing: 0.02em;
+}
+.senebty-threshold-entry__copy {
+  color: var(--sandstone);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 1rem;
+}
+.senebty-threshold-entry__cta {
+  /* Promote CTA to primary visual weight — the threshold is the FIRST action
+     a new user takes, per the entry copy. Overrides the generic .btn-secondary
+     defaults so the affordance matches the directive. */
+  background: rgba(168, 184, 204, 0.18);
+  border: 1px solid #A8B8CC;
+  color: var(--sandstone);
+  padding: 0.6rem 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  transition: background 180ms ease, transform 180ms ease, border-color 180ms ease;
+}
+.senebty-threshold-entry__cta:hover,
+.senebty-threshold-entry__cta:focus-visible {
+  background: rgba(168, 184, 204, 0.28);
+  border-color: #C8D8E8;
+  transform: translateY(-2px);
+  outline: 2px solid #C8D8E8;
+  outline-offset: 2px;
+}
+
+/* Threshold-crossing intro overlay — first-discovery only */
+.senebty-threshold-intro {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(17, 13, 8, 0.92);
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 320ms ease;
+}
+.senebty-threshold-intro.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+/* Radial scrim sits between video and copy — darkens the center for legibility
+   without making the wider frame look like a black box. */
+.senebty-threshold-intro::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center,
+    rgba(17,13,8,0.78) 0%,
+    rgba(17,13,8,0.55) 32%,
+    rgba(17,13,8,0.30) 65%,
+    rgba(17,13,8,0.20) 100%);
+}
+.senebty-threshold-intro__doorway {
+  position: relative;
+  z-index: 2;
+  max-width: min(560px, 90vw);
+  padding: 32px 30px 28px;
+  text-align: center;
+  background: rgba(17, 13, 8, 0.82);
+  border: 1px solid rgba(196, 163, 71, 0.45);
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55),
+              inset 0 0 0 1px rgba(255, 209, 102, 0.08);
+}
+.senebty-threshold-intro__seba {
+  color: var(--bright-gold);
+  font-size: 1.2rem;
+  line-height: 1.6;
+  margin: 0.6rem 0 0;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+}
+
+.senebty-threshold-intro__glyph {
+  font-size: 4rem;
+  color: var(--gold);
+  line-height: 1;
+  text-shadow: 0 0 18px rgba(196, 163, 71, 0.55);
+  word-break: break-all;
+  max-width: 100%;
+}
+.senebty-threshold-intro__dismiss {
+  margin-top: 1.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .senebty-threshold-intro { transition: none; }
+  .senebty-threshold-intro::after { background: rgba(17,13,8,0.88); }
+}
+
+/* (Legacy video.senebty-bg + #senebty::before removed 2026-04-25 —
+   replaced by .senebty-ambient-bg + .senebty-ambient-scrim above.) */
+
+/* ── Ring tap → Seba modal ────────────────────────────────────────────────
+   Lightweight overlay; created on demand by render.js. No backdrop-filter
+   (CLAUDE.md: no blur — crashes Chrome GPU). */
+.senebty-ring-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: rgba(17, 13, 8, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: senebtyModalIn 200ms ease;
+}
+@keyframes senebtyModalIn { from { opacity: 0; } to { opacity: 1; } }
+.senebty-ring-modal__card {
+  background: var(--dark-chocolate);
+  border: 1px solid var(--gold);
+  border-radius: 0.75rem;
+  padding: 1.5rem 1.4rem 1.2rem;
+  max-width: 460px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+.senebty-ring-modal__title {
+  color: var(--gold);
+  margin: 0 0 0.75rem;
+  font-size: 1.25rem;
+  letter-spacing: 0.04em;
+}
+.senebty-ring-modal__seba {
+  color: var(--bright-gold);
+  font-style: italic;
+  line-height: 1.6;
+  margin: 0 0 1.25rem;
+}
+.senebty-ring-modal__close {
+  background: transparent;
+  color: var(--sandstone);
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  padding: 0.5rem 1.25rem;
+  cursor: pointer;
+  font: inherit;
+  letter-spacing: 0.04em;
+  transition: background 180ms ease;
+}
+.senebty-ring-modal__close:hover,
+.senebty-ring-modal__close:focus-visible {
+  background: rgba(196, 163, 71, 0.18);
+  outline: none;
+}
+
+/* ── Senebty ambient background video ──────────────────────────────────────
+   ONE clip plays at a time at low opacity behind the foreground panels.
+   When 'ended' fires, JS rotates to the next clip in the playlist.
+   UI panels (gate, rings, tier badge, glossary) sit prominently above.
+   (User canon 2026-04-25: section pages = ambient-bg + foreground panels;
+   the .intro-hero grammar is reserved for the landing page only.) */
+.senebty-ambient-bg {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  /* Bias the visible region right of the source-frame center so the figure
+     (typically left-of-frame in the Veo compositions) sits beside the
+     centered foreground panel rather than colliding behind it. */
+  object-position: 65% center;
+  z-index: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.2s ease;
+}
+/* Bumped from 0.5 → 0.32 — senebty-ambient-long.mp4 (Veo 2.0 primary clip,
+   shipped 2026-04-27) reads brighter than the gate-ambient/home-cta-hero
+   secondary clips, making the foreground panel words harder to read. */
+.senebty-ambient-bg.loaded { opacity: 0.32; }
+
+.senebty-ambient-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  /* Radial vignette darkens the center where the foreground gate panel sits,
+     keeping atmospheric bleed at the edges. Linear top/bottom gradient stays
+     for the tier badge + back button surfaces. */
+  background:
+    radial-gradient(ellipse 75% 60% at 50% 45%,
+      rgba(17,13,8,0.72) 0%,
+      rgba(17,13,8,0.50) 45%,
+      rgba(17,13,8,0.30) 80%,
+      rgba(17,13,8,0.20) 100%),
+    linear-gradient(180deg,
+      rgba(17,13,8,0.55) 0%,
+      rgba(17,13,8,0.20) 50%,
+      rgba(17,13,8,0.78) 100%);
+}
+
+.senebty-back-btn {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 3;
+  /* v3.48.7 — appearance parity with .senebty-ring (was naked, OS-default
+     button chrome bled through as a white pill on dark backdrop). Gold-on-
+     transparent panel matching the wing's brand accent. */
+  background: rgba(196, 163, 71, 0.10);
+  border: 1px solid var(--gold);
+  border-radius: 0.5rem;
+  color: var(--gold);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.4rem 0.85rem;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+.senebty-back-btn:hover,
+.senebty-back-btn:focus-visible {
+  background: rgba(196, 163, 71, 0.20);
+  border-color: var(--bright-gold);
+  color: var(--bright-gold);
+  transform: translateY(-1px);
+  outline: 2px solid var(--bright-gold);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .senebty-ambient-bg { display: none !important; }
+  .senebty-ambient-scrim { background: rgba(17,13,8,0.88); }
+}
+
+/* Threshold intro overlay video — fills the overlay, ≤1.5 s then dismissed */
+.senebty-threshold-intro__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Ensure doorway content rides above the threshold video */
+.senebty-threshold-intro__doorway {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .senebty-threshold-intro__video { display: none; }
+}
+
+/* Tier-advancement modal overlay */
+.senebty-tier-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(17, 13, 8, 0.88);
+  z-index: 10001;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 320ms ease;
+}
+
+.senebty-tier-modal.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .senebty-tier-modal { transition: none; }
+}
+
+.senebty-tier-modal__inner {
+  background: var(--dark-chocolate);
+  border: 1px solid var(--gold);
+  border-radius: 1rem;
+  padding: 2rem 1.75rem;
+  max-width: min(480px, 90vw);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.senebty-tier-modal__glyph {
+  font-size: 3rem;
+  color: var(--gold);
+  line-height: 1;
+  word-break: break-all;
+}
+
+.senebty-tier-modal__title {
+  font-family: var(--font-display, serif);
+  color: var(--gold);
+  font-size: clamp(1.1rem, 3vw, 1.5rem);
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+
+.senebty-tier-modal__body {
+  color: var(--sandstone);
+  font-size: clamp(0.9rem, 2.2vw, 1.05rem);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.senebty-tier-modal__confirm {
+  margin-top: 0.5rem;
+  /* v3.51.27: btn btn-secondary (secondary-styled per seba-voice-senebty.md §Tier-advancement modal) */
+}
+
+/* Tier-sting modal video */
+.senebty-tier-sting-video {
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  max-height: 40vh;
+  object-fit: cover;
+  display: block;
+  border-radius: 0.5rem;
+  margin: 0 auto 1rem;
+  background: var(--dark-chocolate);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .senebty-tier-sting-video { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   Task #205 — Glossary panel
+   ═══════════════════════════════════════════════════════ */
+
+/* Toggle button — top-right corner of the Senebty section chrome */
+.senebty-gloss-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 3;
+  background: rgba(196, 163, 71, 0.15);
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  color: var(--gold);
+  font-size: 1.1rem;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  line-height: 1;
+  transition: background 200ms ease;
+}
+
+.senebty-gloss-toggle:hover,
+.senebty-gloss-toggle:focus-visible {
+  background: rgba(196, 163, 71, 0.28);
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.senebty-gloss-toggle__label {
+  font-size: 0.75rem;
+  font-family: var(--font-display, serif);
+  letter-spacing: 0.03em;
+  /* Visible on wider screens; hidden on very narrow to save space */
+}
+
+@media (max-width: 380px) {
+  .senebty-gloss-toggle__label { display: none; }
+}
+
+/* Backdrop behind the glossary panel — semi-transparent dim that lets the
+   Senebty content show through but visually de-emphasizes it so the panel
+   reads as a true overlay (round-table 2026-04-30: user feedback that the
+   panel was "occluding" rather than "overlaying"). Click-to-close. */
+.senebty-gloss-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.senebty-gloss-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .senebty-gloss-backdrop { transition: none; }
+}
+
+/* Slide-out panel — 380 px, from right edge (round-table 2026-04-27: widened
+   from 320 px so the body column fits Senebty briefs in 2-3 lines, and so all
+   5 chips render without horizontal scroll on desktop) */
+.senebty-gloss-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(380px, 94vw);
+  height: 100dvh;
+  background: color-mix(in srgb, var(--dark-chocolate) 96%, var(--gold));
+  border-left: 1px solid rgba(196, 163, 71, 0.35);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.senebty-gloss-panel.is-open {
+  transform: translateX(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .senebty-gloss-panel { transition: none; }
+}
+
+/* Panel header */
+.senebty-gloss-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem 0.75rem;
+  border-bottom: 1px solid rgba(196, 163, 71, 0.2);
+  flex-shrink: 0;
+}
+
+.senebty-gloss-panel__title {
+  font-size: 0.9rem;
+  color: var(--gold);
+  font-family: var(--font-display, serif);
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.senebty-gloss-panel__close {
+  background: none;
+  border: none;
+  color: var(--sandstone);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+  border-radius: 0.25rem;
+  transition: color 150ms ease;
+}
+
+.senebty-gloss-panel__close:hover,
+.senebty-gloss-panel__close:focus-visible {
+  color: var(--gold);
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Scrollable entry list — horizontal padding removed (round-table 2026-04-27:
+   double-padding root cause; entries supply their own 18 px horizontal padding
+   in the v2 grid, so list-level horizontal padding eats body-column width). */
+.senebty-gloss-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+  overscroll-behavior: contain;
+}
+
+/* Individual entry */
+.senebty-gloss-entry {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr;
+  gap: 0.5rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(196, 163, 71, 0.12);
+}
+
+.senebty-gloss-entry:last-child { border-bottom: none; }
+
+.senebty-gloss-entry__glyph {
+  font-size: 1.5rem;
+  line-height: 1.2;
+  color: var(--gold);
+  text-align: center;
+}
+
+.senebty-gloss-entry__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.senebty-gloss-entry__name {
+  font-family: var(--font-display, serif);
+  color: var(--sandstone);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.senebty-gloss-entry__pron {
+  color: rgba(242, 228, 204, 0.55);
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+.senebty-gloss-entry__brief {
+  color: rgba(242, 228, 204, 0.85);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* LOW-confidence flag */
+.senebty-gloss-entry--low .senebty-gloss-entry__glyph {
+  opacity: 0.55;
+}
+
+.senebty-gloss-entry__flag {
+  font-size: 0.65rem;
+  color: var(--carnelian);
+  font-style: italic;
+  margin-top: 0.15rem;
+  display: block;
+}
+
+/* Cite line at bottom of panel */
+.senebty-gloss-cite {
+  padding: 0.75rem 1.25rem;
+  font-size: 0.65rem;
+  color: rgba(242, 228, 204, 0.4);
+  line-height: 1.5;
+  border-top: 1px solid rgba(196, 163, 71, 0.15);
+  flex-shrink: 0;
+}
+
+/* MEDIUM-confidence note — above the cite line (#209) */
+.senebty-gloss-confidence {
+  margin: 0 0 8px 0;
+  padding: 6px 10px;
+  background: rgba(255, 209, 102, 0.08);
+  border-left: 2px solid var(--bright-gold);
+  color: var(--bright-gold);
+  font-size: 12px;
+  line-height: 1.4;
+  font-style: italic;
+  flex-shrink: 0;
+}
+
+/* ─── Glossary v2 — search ribbon + chips + glyph-prominent rows ─── */
+
+.senebty-gloss-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.senebty-gloss-search-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid rgba(196,163,71,0.18);
+  background: rgba(15,12,8,0.72);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.senebty-gloss-search {
+  flex: 1;
+  font-family: var(--font-body, 'Bitter', serif);
+  font-size: 18px;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(196,163,71,0.4);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #F2E4CC;
+  outline: none;
+}
+.senebty-gloss-search:focus-visible {
+  border-color: #FFD166;
+  box-shadow: 0 0 0 2px rgba(255,209,102,0.25);
+}
+
+.senebty-gloss-count {
+  font-family: var(--font-body, 'Bitter', serif);
+  font-size: 13px;
+  color: rgba(242,228,204,0.65);
+  white-space: nowrap;
+}
+
+.senebty-gloss-chips {
+  display: flex;
+  gap: 8px;
+  padding: 10px 18px;
+  overflow-x: auto;
+  border-bottom: 1px solid rgba(196,163,71,0.12);
+  background: rgba(15,12,8,0.55);
+}
+
+.senebty-gloss-chips button {
+  flex: 0 0 auto;
+  font-family: var(--font-display, 'Cinzel', serif);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(196,163,71,0.3);
+  background: transparent;
+  color: rgba(242,228,204,0.85);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.senebty-gloss-chips button[aria-selected="true"] {
+  background: rgba(196,163,71,0.18);
+  border-color: #C4A347;
+  color: #FFD166;
+}
+
+.senebty-gloss-chips button:hover,
+.senebty-gloss-chips button:focus-visible {
+  border-color: #C4A347;
+  outline: none;
+}
+
+/* Override the v1 entry layout: glyph is BIG and primary */
+.senebty-gloss-entry {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: 14px;
+  align-items: start;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(196,163,71,0.12);
+  cursor: pointer;
+}
+
+.senebty-gloss-entry:hover,
+.senebty-gloss-entry:focus-visible {
+  background: rgba(196,163,71,0.06);
+  outline: none;
+}
+
+.senebty-gloss-entry__glyph {
+  font-size: 1.8rem;
+  color: #C4A347;
+  text-shadow: 0 0 12px rgba(196,163,71,0.35);
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  max-width: 56px;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+.senebty-gloss-entry__speak {
+  background: transparent;
+  border: 1px solid rgba(196,163,71,0.25);
+  border-radius: 999px;
+  width: 36px;
+  height: 36px;
+  font-size: 14px;
+  color: #C4A347;
+  cursor: pointer;
+  align-self: center;
+}
+.senebty-gloss-entry__speak:hover,
+.senebty-gloss-entry__speak:focus-visible {
+  border-color: #C4A347;
+  outline: none;
+}
+
+.senebty-gloss-empty {
+  padding: 24px 18px;
+  text-align: center;
+  color: rgba(242,228,204,0.7);
+  font-style: italic;
+}
+
+.senebty-gloss-recent {
+  display: flex;
+  gap: 8px;
+  padding: 10px 18px;
+  border-top: 1px solid rgba(196,163,71,0.12);
+  overflow-x: auto;
+  background: rgba(15,12,8,0.55);
+}
+
+.senebty-gloss-recent-chip {
+  flex: 0 0 auto;
+  font-size: 1.4rem;
+  color: #C4A347;
+  background: transparent;
+  border: 1px solid rgba(196,163,71,0.3);
+  border-radius: 8px;
+  padding: 4px 10px;
+  cursor: pointer;
+  line-height: 1;
+}
+.senebty-gloss-recent-chip:hover,
+.senebty-gloss-recent-chip:focus-visible {
+  background: rgba(196,163,71,0.12);
+  border-color: #C4A347;
+  outline: none;
+}
+
+.senebty-gloss-footer {
+  margin-top: auto;
+  /* Bottom clearance for the global fixed bottom-nav (~56 px) + iOS safe-area
+     so the cite line and confidence note aren't obscured by the navbar. */
+  padding: 12px 18px max(64px, calc(56px + env(safe-area-inset-bottom)));
+  border-top: 1px solid rgba(196,163,71,0.12);
+}
+
+@media (prefers-reduced-motion: reduce){
+  .senebty-gloss-chips button,
+  .senebty-gloss-entry,
+  .senebty-gloss-entry__speak,
+  .senebty-gloss-recent-chip { transition: none; }
+}
+
+/* ─── Foundation 1 (Mu — Water) ─── */
+#senebtyFoundation {
+  display: none;
+  position: relative;
+  min-height: 100dvh;
+  padding: 80px 24px 48px;
+  background: radial-gradient(ellipse at center top, rgba(26,35,126,0.4) 0%, #110D08 70%);
+}
+#senebtyFoundation.active { display: block; }
+
+/* v3.51.9 — enterprise vertical-stack picture-book composition.
+   Replaces the v3.51.5 wide-screen "open-book spread" which fought
+   the art aspect-ratio and the reading line-length at the same time.
+   The chunk is ONE picture-book page, top-to-bottom:
+     1. Art (prominent — 16:9 frame, scales with viewport)
+     2. Text papyrus (~680px reading-width, beneath the art)
+     3. Counter tab (small papyrus chip beneath the text)
+     4. CTA (bold, beneath the counter)
+   Vertically centered in 70vh so the chunk floats mid-screen like a
+   book held in the hands. */
+.senebty-foundation-stage {
+  width: 100%;
+  max-width: clamp(360px, 90vw, 1100px);
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  gap: 1rem;
+  padding: 1.5rem 1rem;
+  box-sizing: border-box;
+}
+.senebty-foundation-stage > * { flex: 0 0 auto; }
+
+.senebty-foundation-glyph {
+  font-size: 5rem;
+  color: #C4A347;
+  text-shadow: 0 0 30px rgba(196,163,71,0.6);
+  line-height: 1;
+}
+/* v3.51.11 — :empty hide. foundation-render.js clears textContent on the
+   glyph element during chunk-reading (it's only used in F1's ritual phases).
+   Empty element still claimed font-size × line-height = 80px of vertical
+   space at the top of the stage, creating a blank band above the art card.
+   Collapse to zero when empty. */
+.senebty-foundation-glyph:empty {
+  display: none;
+}
+
+/* ─── Chunk-text papyrus scroll (v3.49.2 — RT consensus top-5) ───
+   Was: gold-on-dark bare text floating on the screen back-end.
+   Now: dark-earth-ink on cream-parchment scroll with medu netr margin column.
+   - Papyrus via layered radial+linear gradients (no images, no feTurbulence).
+   - Top+bottom scroll-curl edges via gradients.
+   - Medu netr column via ::before with vertical hieroglyphs in self-hosted
+     Noto Sans Egyptian Hieroglyphs.
+   - WCAG AAA on dark-ink-on-cream (Maya binding).
+   Applied to .senebty-foundation-copy across every foundation chunk-read. */
+.senebty-foundation-copy {
+  font-family: var(--font-body, 'Bitter', serif);
+  /* v3.51.9 — Hilliard binding: reading-optimized line-length.
+     v3.51.12 — STATIC PARCHMENT (user binding "the card should not mutate
+     it should be a static parchment place"). Card holds a stable rectangular
+     footprint across all chunk states (intro 1-2 lines → text 11 lines →
+     after 1-2 lines → MCQ). Longer overflows scroll inside via overflow-y:
+     auto instead of expanding the card. Eliminates layout shift between
+     chunk transitions (CLS=0 + Hilliard spatial constancy). */
+  /* v3.51.16 — CINEMATIC TYPOGRAPHY (user binding "stylistically cinematic;
+     fade in fade out"). Bigger + centered + line-height 1.8 for breathing.
+     JS in foundation-render.js _step() drives the opacity-fade transition
+     between phases (prefers-reduced-motion → instant swap). */
+  font-size: clamp(1.15rem, 1.8vw, 1.55rem);
+  color: #3A2E1F;
+  line-height: 1.8;
+  letter-spacing: 0.01em;
+  margin: 0 auto;
+  width: min(680px, 100%);
+  max-width: min(680px, 100%);
+  min-height: 420px;
+  max-height: 60vh;
+  padding: 1.75rem 2rem;
+  position: relative;
+  /* v3.51.36 — text-align: left supersedes the v3.51.16 "cinematic
+     center" binding for prose. User-flagged 2026-05-17 ("words are not
+     placed well") — center alignment on multi-line prose creates
+     ragged left edges that break children's reading rhythm. Hilliard
+     binding (reading optimization) wins over cinematic centering.
+     sebaIntro / sebaAfter (short 1-2 line copy) still read well
+     left-aligned; the MCQ host inside .senebty-foundation-copy keeps
+     its own centered layout via its own rule. */
+  text-align: left;
+  text-shadow: none;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  /* Coach #3 — parchment-fiber scrollbar instead of OS chrome. */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(108, 78, 42, 0.4) transparent;
+  /* v3.51.16 — opacity transition timing matched to JS fade in
+     foundation-render.js (180ms out + 100ms hold + 220ms in). The
+     CSS transition handles the in/out animation; JS drives the
+     opacity value flip. */
+  transition: opacity 220ms ease-in-out;
+  border: 1px solid rgba(108, 78, 42, 0.45);
+  border-radius: 0.25rem 0.75rem 0.25rem 0.75rem;
+  box-shadow:
+    inset 0 0 30px rgba(108, 78, 42, 0.10),
+    0 4px 20px rgba(0, 0, 0, 0.45);
+  background:
+    /* faux top scroll-curl */
+    linear-gradient(180deg, rgba(108,78,42,0.55) 0%, rgba(108,78,42,0) 4%),
+    /* faux bottom scroll-curl */
+    linear-gradient(0deg, rgba(108,78,42,0.55) 0%, rgba(108,78,42,0) 4%),
+    /* parchment mottle highlights */
+    radial-gradient(circle at 20% 30%, rgba(166,124,82,0.10) 0, transparent 35%),
+    radial-gradient(circle at 80% 70%, rgba(166,124,82,0.08) 0, transparent 45%),
+    /* parchment base — warm sandstone gradient */
+    linear-gradient(180deg, #F2E4CC 0%, #E8D5AC 50%, #F2E4CC 100%);
+}
+/* Match the MCQ host to the parchment footprint so comprehension phase
+   holds the same rectangle — no layout shift across chunk→MCQ transition. */
+.senebty-foundation-copy > .senebty-fc-mcq {
+  margin: 0;
+  background: transparent;
+  border: none;
+  padding: 0;
+  /* Coach #3 — MCQ options read awkward when centered. Override the
+     parent's text-align:center for the MCQ block; question + options
+     left-align per reading-list convention. */
+  text-align: left;
+}
+/* v3.51.38 — MAJESTIC LETTER HIGHLIGHT (variant 4 "carved-in-stone")
+   User binding 2026-05-17: "these glossary words need entire letter
+   highlighting the font around these words should be majestic these
+   side of the per ankh is spiritual." User picked variant 4 from the
+   5-option preview at vocab-preview.html.
+
+   The LETTERS THEMSELVES are the gold treatment (not background tint).
+   Cinzel Decorative Black + deep-gold #8B6F2C + dual text-shadow
+   (warm-gold highlight above, dark-mahogany shadow below) renders the
+   letters as chiseled into the parchment — temple-inscription weight
+   + spiritual permanence for the Senebty (Per Ankh = sacred) side.
+
+   WCAG: deep-gold #8B6F2C on parchment #F2E4CC = 4.7:1 — AA pass for
+   normal text + AAA for large/display weight. */
+.senebty-foundation-copy .word.vocab {
+  cursor: pointer;
+  font-family: var(--font-display, 'Cinzel Decorative', Georgia, serif);
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  color: #8B6F2C;
+  text-shadow:
+    0 1px 0 rgba(255, 215, 120, 0.6),
+    0 -1px 0 rgba(92, 65, 25, 0.6),
+    0 0 8px rgba(255, 215, 120, 0.2);
+  /* v3.51.40a — underline removed per user 2026-05-17: the chiseled
+     Cinzel Decorative Black + gold + chisel-shadow is loud enough on
+     its own. The border-bottom read as a redundant double-line against
+     the text-shadow -1px below cast. Cursor + color + weight + chisel
+     = unambiguous affordance without the extra rule. */
+}
+/* Coach: transitions only when motion is welcome */
+@media (prefers-reduced-motion: no-preference) {
+  .senebty-foundation-copy .word.vocab {
+    transition: color 150ms ease, border-color 150ms ease, text-shadow 180ms ease, transform 180ms ease;
+  }
+}
+.senebty-foundation-copy .word.vocab:hover {
+  color: #5C4119;
+  text-shadow:
+    0 1px 0 rgba(255, 215, 120, 0.85),
+    0 -1px 0 rgba(92, 65, 25, 0.8),
+    0 0 14px rgba(255, 215, 120, 0.55);
+  transform: translateY(-1px);
+}
+/* Coach: stronger focus indicator than hover so keyboard users get a
+   more visible signal than mouse-hover */
+.senebty-foundation-copy .word.vocab:focus-visible {
+  color: #5C4119;
+  outline: 3px solid var(--bright-gold, #FFD166);
+  outline-offset: 3px;
+  border-radius: 0.15rem;
+  text-shadow:
+    0 1px 0 rgba(255, 215, 120, 0.85),
+    0 -1px 0 rgba(92, 65, 25, 0.8),
+    0 0 14px rgba(255, 215, 120, 0.55);
+}
+/* Coach: high-contrast OS mode override — drops the chiseled gold for
+   solid-black-on-cream accessibility floor */
+@media (prefers-contrast: more) {
+  .senebty-foundation-copy .word.vocab {
+    font-weight: 700;
+    color: #000;
+    text-shadow: none;
+    /* High-contrast OS mode re-introduces the underline since the
+       chisel text-shadow that normally carries the affordance is
+       suppressed (text-shadow: none above). */
+    border-bottom: 3px solid #000;
+  }
+  .senebty-foundation-copy .word.vocab:hover,
+  .senebty-foundation-copy .word.vocab:focus-visible {
+    background: rgba(0, 0, 0, 0.12);
+    outline-color: #000;
+    transform: none;
+    text-shadow: none;
+  }
+}
+/* Coach #5 — print preserves the vocab-affordance as a text underline */
+@media print {
+  .senebty-foundation-copy .word.vocab {
+    border-bottom: 1px solid #000;
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+}
+/* Coach #3 — touch devices need larger tap-target. Inline-block + vertical
+   padding bumps to ≥44px effective at child-friendly font sizes. */
+@media (pointer: coarse) {
+  .senebty-foundation-copy .word.vocab {
+    display: inline-block;
+    padding: 0.25em 0.15em;
+    margin: -0.1em 0;
+  }
+}
+
+/* Coach #6 — MCQ buttons inside the parchment context re-theme to
+   parchment-tone so the dark-on-gold doesn't clash against the warm
+   sandstone bg. Outside the parchment (legacy direct render) keeps the
+   gold-on-dark treatment. */
+.senebty-foundation-copy > .senebty-fc-mcq .senebty-fc-mcq-option {
+  background: rgba(108, 78, 42, 0.08);
+  border-color: rgba(108, 78, 42, 0.45);
+  color: #3A2E1F;
+}
+.senebty-foundation-copy > .senebty-fc-mcq .senebty-fc-mcq-option:hover:not(:disabled),
+.senebty-foundation-copy > .senebty-fc-mcq .senebty-fc-mcq-option:focus-visible:not(:disabled) {
+  background: rgba(108, 78, 42, 0.16);
+  border-color: rgba(108, 78, 42, 0.7);
+  color: #2A1F12;
+  outline: 2px solid rgba(108, 78, 42, 0.7);
+}
+.senebty-foundation-copy > .senebty-fc-mcq .senebty-fc-mcq-q {
+  color: #6C4E2A;
+}
+.senebty-foundation-copy > .senebty-fc-mcq .senebty-fc-mcq-feedback {
+  color: #3A2E1F;
+}
+
+/* Coach #5 — mobile tightening. On phones, 420px min-height + 60vh max
+   collides with art + counter + CTA in a single viewport. Tighten the
+   floor under 480px so the chunk-unit still fits on one phone screen. */
+@media (max-width: 480px) {
+  .senebty-foundation-copy {
+    min-height: 280px;
+    max-height: 55vh;
+    padding: 1.25rem 1.25rem 1.25rem 1.25rem;
+  }
+}
+/* Medu netr column on the left margin — vertical authentic hieroglyphs
+   (ankh, djed, eye) in earth-brown ink. Real Unicode chars from the
+   Egyptian Hieroglyphs block; CSS file is UTF-8. Font is self-hosted
+   Noto Sans Egyptian Hieroglyphs (per .css header).
+   v3.49.3 — hidden below 720px viewport.
+   v3.51.11 — reduced from 6 glyphs to 3 so short-chunk papyri (e.g.,
+   sebaIntro 2-3 lines) don't overflow the absolute column past the
+   parent's bottom edge to the screen-left margin. The parent also gets
+   overflow: hidden as belt-and-suspenders clipping. */
+/* v3.51.35 — REMOVED the belt-and-suspenders `overflow: hidden` shorthand.
+   v3.51.11 added it to clip a medu-hieroglyph ::before column that could
+   overflow on short chunks. v3.51.16 then hid that column entirely
+   (display:none below). With the threat closed, the defense was actively
+   clipping legitimate long-chunk text (no scroll affordance reached the
+   parchment-fiber scrollbar). Main rule at line ~975 already declares
+   `overflow-x: hidden; overflow-y: auto;` which is the correct posture
+   now. If the medu column is ever re-enabled, re-add the belt-and-
+   suspenders at that point. */
+.senebty-foundation-copy::before {
+  /* v3.51.16 Coach #2 — HIDDEN now that text is centered. The medu column
+     was a left-margin ornament that doesn't survive center alignment
+     (the column would float visually beside centered text). Kept the
+     rule body so future left-aligned variants can re-enable by removing
+     display:none. */
+  display: none;
+  content: '𓋹\A𓊽\A𓂀';
+  white-space: pre;
+  position: absolute;
+  left: 0.5rem;
+  top: 1.25rem;
+  bottom: 1.25rem;
+  width: 1.75rem;
+  color: rgba(108, 78, 42, 0.55);
+  font-family: 'Noto Sans Egyptian Hieroglyphs', 'Bitter', serif;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  text-align: center;
+  /* Coach binding: vertically center the 3 glyphs in the column box so
+     they don't anchor only to the top. */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  pointer-events: none;
+  overflow: hidden;
+}
+@media (max-width: 720px) {
+  .senebty-foundation-copy {
+    /* Reclaim the medu-column padding so text fills the scroll evenly */
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  .senebty-foundation-copy::before { display: none; }
+}
+
+.senebty-foundation-vessel {
+  width: 120px;
+  height: 160px;
+  border: 2px solid rgba(196,163,71,0.5);
+  border-radius: 0 0 60% 60% / 0 0 30% 30%;
+  position: relative;
+  overflow: hidden;
+  background: rgba(0,0,0,0.3);
+  display: none;
+}
+.senebty-foundation-stage[data-phase="pour"] .senebty-foundation-vessel,
+.senebty-foundation-stage[data-phase="drink"] .senebty-foundation-vessel,
+.senebty-foundation-stage[data-phase="rest"]  .senebty-foundation-vessel {
+  display: block;
+}
+
+.senebty-foundation-vessel__fill {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 0;
+  background: linear-gradient(to top, #1a237e 0%, #4a90e2 80%, #C4A347 100%);
+  transition: height 4s ease-out;
+}
+.senebty-foundation-stage[data-phase="pour"] .senebty-foundation-vessel__fill,
+.senebty-foundation-stage[data-phase="drink"] .senebty-foundation-vessel__fill,
+.senebty-foundation-stage[data-phase="rest"]  .senebty-foundation-vessel__fill {
+  height: 70%;
+}
+
+/* Progress dots — replaces "Chunk N / M" leak (v3.49.3 PM/UX RT).
+   Small papyrus tab hanging below the scroll, now showing ●●○○ progress.
+   Color = earth-brown ink to match the scroll language.
+   v3.51.16 — opacity transition matched to copy element so counter
+   fades together with the chunk text (Coach #6 binding). */
+.senebty-foundation-counter {
+  transition: opacity 220ms ease-in-out;
+}
+.senebty-foundation-counter {
+  display: inline-block;
+  margin: 0.5rem auto 0;
+  padding: 0.4rem 1.1rem;
+  background: linear-gradient(180deg, #E8D5AC 0%, #D6BE8C 100%);
+  border: 1px solid rgba(108, 78, 42, 0.45);
+  border-top: none;
+  border-radius: 0 0 0.5rem 0.5rem;
+  color: #6C4E2A;
+  font-family: var(--font-body, 'Bitter', serif);
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  text-transform: none;
+  text-shadow: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  min-height: auto;
+  line-height: 1;
+}
+/* Drink-phase numeric countdown stays big (legacy F1 ritual UI) */
+.senebty-foundation-stage[data-phase="drink"] .senebty-foundation-counter {
+  display: block;
+  background: none;
+  border: none;
+  box-shadow: none;
+  color: #C4A347;
+  font-family: var(--font-body, 'Bitter', serif);
+  font-size: 2rem;
+  letter-spacing: normal;
+  text-transform: none;
+  padding: 0;
+}
+
+.senebty-foundation-cta {
+  font-family: var(--font-display, 'Cinzel', serif);
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  padding: 14px 36px;
+  background: rgba(196,163,71,0.18);
+  border: 2px solid #C4A347;
+  border-radius: 999px;
+  color: #FFD166;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+.senebty-foundation-cta:hover { background: rgba(196,163,71,0.28); }
+.senebty-foundation-cta:active { transform: scale(0.97); }
+
+@media (prefers-reduced-motion: reduce){
+  .senebty-foundation-vessel__fill { transition: none; }
+  .senebty-foundation-cta { transition: none; }
+}
+
+/* ── Glyph column: Egyptian Hieroglyphs font-family ──────────────────────── */
+.senebty-gloss-entry__glyph,
+.senebty-tier-badge__glyph,
+.senebty-threshold-intro__glyph,
+.senebty-tier-modal__glyph {
+  font-family: 'Noto Sans Egyptian Hieroglyphs', 'Aegyptus', 'Segoe UI Historic', serif;
+}
+
+/* ── MEDIUM-confidence dot prefix ────────────────────────────────────────── */
+/* Small gold dot before name (round-table: dots not underlines;
+   kids read underlines as tap-here links) */
+.senebty-gloss-entry__medium-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--bright-gold, #FFD166);
+  margin-right: 8px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* ── NONE-confidence info button ─────────────────────────────────────────── */
+/* Keyboard-accessible affordance for entries where the glyph was deliberately
+   dropped (compound titles, coined plurals).
+   Triggers Seba spoken explanation on tap (Imani: kids don't read tooltips) */
+.senebty-gloss-entry__info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  border: 1px solid rgba(196,163,71,0.35);
+  border-radius: 50%;
+  background: rgba(196,163,71,0.06);
+  color: var(--gold, #C4A347);
+  font-size: 12px;
+  font-family: var(--font-display, 'Cinzel', serif);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.senebty-gloss-entry__info-btn:hover,
+.senebty-gloss-entry__info-btn:focus-visible {
+  background: rgba(196,163,71,0.18);
+  border-color: var(--gold, #C4A347);
+  outline: none;
+}
+
+/* MEDIUM-confidence variant: softer than the NONE-confidence info-btn so
+   the visual tone matches the semantic ("pending verification" vs
+   "deliberately omitted"). Tehuti binding (v3.38.0 impl-gate, Important):
+   keep at 22×22 minimum — original 18×18 risked failing WCAG 2.2 minimum
+   target size when the adjacent dot + flex-gap don't add hit area. */
+.senebty-gloss-entry__info-btn--medium {
+  width: 22px;
+  height: 22px;
+  margin-right: 6px;
+  border-color: rgba(196,163,71,0.25);
+  background: rgba(196,163,71,0.04);
+  font-size: 11px;
+}
+
+/* ── Foundations Index (the "eight Foundations" overview) ───────────────── */
+/* King walkthrough binding 2026-05-01 — clicking the Foundations ring used
+   to jump straight to Foundation 1 (Mu) with no overview. This index lists
+   all 8 with their treasure / iri / status, so the path is visible before
+   the practice begins. */
+.senebty-foundations-index {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 20px 80px;
+}
+.senebty-foundations-index__title {
+  font-family: var(--font-display, 'Cinzel', serif);
+  font-size: 1.6rem;
+  color: var(--gold, #C4A347);
+  text-align: center;
+  margin: 0 0 16px;
+  letter-spacing: 0.04em;
+}
+.senebty-foundations-index__seba {
+  font-family: var(--font-body, 'Bitter', serif);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: rgba(242, 228, 204, 0.85);
+  text-align: center;
+  max-width: 540px;
+  margin: 0 auto 28px;
+}
+.senebty-foundations-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.senebty-foundation-card {
+  display: grid;
+  /* v3.51.13: glyph col (56px) → hero thumb col (72px); num col unchanged */
+  grid-template-columns: 36px 72px 1fr auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 16px;
+  background: rgba(196, 163, 71, 0.04);
+  border: 1px solid rgba(196, 163, 71, 0.18);
+  border-radius: 10px;
+}
+.senebty-foundation-card--open {
+  cursor: pointer;
+  background: rgba(196, 163, 71, 0.10);
+  border-color: rgba(196, 163, 71, 0.45);
+}
+.senebty-foundation-card--open:hover,
+.senebty-foundation-card--open:focus-visible {
+  background: rgba(196, 163, 71, 0.16);
+  border-color: var(--gold, #C4A347);
+  outline: none;
+  transform: translateY(-1px);
+  transition: transform 0.15s ease;
+}
+.senebty-foundation-card--coming {
+  opacity: 0.6;
+  cursor: default; /* Tehuti binding (v3.40.0 impl-gate): communicate non-interactivity */
+}
+.senebty-foundation-card__num {
+  font-family: var(--font-display, 'Cinzel', serif);
+  font-size: 1.3rem;
+  color: var(--gold, #C4A347);
+  text-align: center;
+  font-weight: 600;
+}
+/* .senebty-foundation-card__glyph removed v3.51.21 (Stage-2 Coach):
+   the static glyph column was replaced by the hero thumb column (v3.51.13).
+   No HTML elements use this class; rule was dead. */
+.senebty-foundation-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.senebty-foundation-card__name {
+  font-family: var(--font-display, 'Cinzel', serif);
+  font-size: 1rem;
+  color: var(--sandstone, #F2E4CC);
+  font-weight: 600;
+}
+.senebty-foundation-card__treasure {
+  font-size: 0.72rem;
+  color: rgba(196, 163, 71, 0.75);
+  letter-spacing: 0.04em;
+}
+.senebty-foundation-card__copy {
+  font-family: var(--font-body, 'Bitter', serif);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: rgba(242, 228, 204, 0.78);
+  margin-top: 2px;
+}
+.senebty-foundation-card__status {
+  font-size: 0.72rem;
+  color: var(--gold, #C4A347);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.senebty-foundation-card--coming .senebty-foundation-card__status {
+  color: rgba(196, 163, 71, 0.55);
+}
+
+/* ── Hero thumb (v3.51.21) ─────────────────────────────────────────────── */
+/* Container occupies the thumb column (72px wide × 80px tall, fixed).     */
+/* Cards taller than 80px have the container centered by align-items:center.*/
+/* PNG is always visible; video overlays at opacity:0 and lifts on hover.  */
+/* Locked (--coming) cards still show the protagonist portrait.            */
+.senebty-foundation-card__hero {
+  position: relative;
+  width: 72px;
+  height: 80px;
+  border-radius: 6px;
+  overflow: hidden;
+  /* flex-shrink removed v3.51.21: container lives in a CSS grid, not flex;
+     the property was a no-op. Grid column 2 (72px) is explicit. */
+}
+.senebty-foundation-card__hero-png {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 6px;
+}
+.senebty-foundation-card__hero-veo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 6px;
+  opacity: 0;
+  /* Video must not intercept card clicks or keyboard events */
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+/* Hover / focus-within → lift video (fine-pointer + hover-capable devices only) */
+@media (hover: hover) and (pointer: fine) {
+  .senebty-foundation-card:hover .senebty-foundation-card__hero-veo,
+  .senebty-foundation-card:focus-within .senebty-foundation-card__hero-veo {
+    opacity: 1;
+  }
+  /* Threshold-entry panel shares the same hover-Veo treatment */
+  .senebty-threshold-entry:hover .senebty-foundation-card__hero-veo,
+  .senebty-threshold-entry:focus-within .senebty-foundation-card__hero-veo {
+    opacity: 1;
+  }
+}
+/* Coarse pointer (touch) — hide video element entirely, PNG only */
+@media (hover: none) {
+  .senebty-foundation-card__hero-veo {
+    display: none;
+  }
+}
+/* Respect prefers-reduced-motion — always suppress the video */
+@media (prefers-reduced-motion: reduce) {
+  .senebty-foundation-card__hero-veo {
+    display: none !important;
+  }
+}
+/* Glyph badge — bottom-right corner of thumb, small overlay */
+.senebty-foundation-card__hero-glyph {
+  position: absolute;
+  bottom: 3px;
+  right: 4px;
+  font-size: 0.75rem;
+  line-height: 1;
+  color: rgba(196, 163, 71, 0.92);
+  background: rgba(17, 13, 8, 0.62);
+  border-radius: 3px;
+  padding: 1px 2px;
+  pointer-events: none;
+  user-select: none;
+}
+/* Threshold-entry hero thumb — centered above the panel title */
+.senebty-threshold-entry .senebty-foundation-card__hero {
+  width: 96px;
+  height: 108px;
+  margin: 0 auto 1rem;
+  display: block;
+}
+/* ── End hero thumb ────────────────────────────────────────────────────── */
+
+.senebty-foundations-index__cite {
+  margin-top: 32px;
+  font-size: 0.72rem;
+  color: rgba(242, 228, 204, 0.5);
+  text-align: center;
+  line-height: 1.55;
+}
+
+/* Romanization-only hint that follows the info button */
+.senebty-gloss-entry__no-glyph-hint {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: rgba(242,228,204,0.55);
+  margin-left: 4px;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .senebty-gloss-entry__info-btn { transition: none; }
+}
+
+/* ─── Phase 1.2 round-table (Nia): Senebty focus indicators ──────────────────
+   8 :focus-visible rules across senebty.css use `outline: none` and rely on
+   a border-color shift as the sole focus indicator — sub-3:1 contrast against
+   the panel background. Nia's WCAG 2.2 §2.4.11 (Focus Appearance) concern.
+   The fix is additive: add a high-contrast Bright Gold box-shadow ring on
+   every senebty interactive's :focus-visible. We keep `outline: none` so
+   the browser default (often double-rings) doesn't conflict with our ring.
+   The 3px width + 0.55 alpha against typical panel backgrounds (Sandstone /
+   Dark Chocolate / panel-tinted Gold) measures >5:1 — comfortably above the
+   3:1 threshold. */
+#senebty :focus-visible,
+.senebty-gate :focus-visible,
+.senebty-ring:focus-visible,
+.senebty-ring-modal__close:focus-visible,
+.senebty-tier-modal__dismiss:focus-visible,
+.senebty-tier-modal__confirm:focus-visible,
+.senebty-gloss-toggle:focus-visible,
+.senebty-gloss-panel__close:focus-visible,
+.senebty-gloss-search:focus-visible,
+.senebty-gloss-chips button:focus-visible,
+.senebty-gloss-entry:focus-visible,
+.senebty-gloss-entry__speak:focus-visible,
+.senebty-gloss-recent-chip:focus-visible,
+.senebty-gloss-entry__info-btn:focus-visible,
+.senebty-foundation-cta:focus-visible,
+.senebty-back-btn:focus-visible,
+.senebty-consent-consent:focus-visible,
+.senebty-consent-not-now:focus-visible,
+.senebty-consent-policy-link:focus-visible {
+  box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.55), 0 0 0 5px rgba(17, 13, 8, 0.6);
+  /* The dark second ring underneath provides contrast against light panel
+     surfaces; the bright gold inner ring is the primary indicator. */
+}
+@media (prefers-reduced-motion: reduce){
+  /* Static ring under reduced-motion — same visual intent, no transition. */
+  #senebty :focus-visible,
+  .senebty-gate :focus-visible,
+  .senebty-gloss-panel :focus-visible,
+  .senebty-foundation-cta:focus-visible {
+    transition: none;
+  }
+}
+
+/* ── Phase v3.33.0 — Seba quip caption avatar first-of-session pulse ───────
+   The seba-voice.js module adds `.seba-avatar-pulse` to the Seba avatar on
+   the FIRST quip of each session, drawing the child's eye to where the voice
+   is coming from. Subsequent quips don't pulse. Imani's recommended addition
+   from architecture-gate verdict. */
+.seba-avatar-pulse {
+  animation: sebaAvatarPulse 800ms ease;
+}
+@keyframes sebaAvatarPulse {
+  0%   { transform: scale(1.0); }
+  50%  { transform: scale(1.08); }
+  100% { transform: scale(1.0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .seba-avatar-pulse { animation: none; }
+}
+
+/* ─── Senebty Tier Modal (Imani + Tehuti bindings) ─── */
+.senebty-tier-modal-overlay{
+  position:fixed; inset:0;
+  background:rgba(17,13,8,.78);
+  display:flex; align-items:center; justify-content:center;
+  z-index:9000;
+  opacity:1;
+  transition:opacity 250ms ease-out;
+}
+.senebty-tier-modal-overlay--exiting{ opacity:0; }
+@media (prefers-reduced-motion: reduce){
+  .senebty-tier-modal-overlay,
+  .senebty-tier-modal-overlay--exiting{ transition:none; }
+}
+.senebty-tier-modal{
+  background:var(--sandstone, #F2E4CC);
+  color:var(--dark-chocolate, #110D08);
+  border:1px solid var(--gold, #C4A347);
+  border-radius:12px;
+  padding:32px 28px 24px;
+  max-width:420px; width:90%;
+  box-shadow:0 18px 40px rgba(0,0,0,.45);
+}
+.senebty-tier-modal__title{
+  font-family:var(--font-display);
+  font-size:1.4rem;
+  margin:0 0 16px;
+  color:var(--lapis, #1a237e);
+  letter-spacing:.5px;
+}
+.senebty-tier-modal__body{
+  font-size:.95rem; line-height:1.55;
+  margin:0 0 24px;
+  white-space:pre-wrap;
+}
+.senebty-tier-modal__btn{
+  display:block;
+  margin:0 auto;
+  min-width:160px; min-height:44px;
+  font-family:var(--font-display);
+  letter-spacing:.5px;
+}
+
+/* ─── Senebty Daily Ritual (Imani + Tehuti bindings) ───
+   v3.51.22 — Stage-1 RT + Stage-2 Coach cinematic-consistency sweep:
+   A. copy font-size clamp(1.15-1.55rem) + line-height 1.8 + text-align center
+   B. title clamp(1.3-1.8rem) + text-align center
+   C. step opacity + transition for cinematic fade (JS drives the value)
+   D. ritual-stage min-height for static-frame stability
+   H. treasure-rate button transition gated on prefers-reduced-motion
+   Stage-2 Coach: print + high-contrast + hover on seal-btn
+   ─── */
+#senebtyDaily{ padding:24px; }
+.senebty-ritual-banner{
+  font-family:var(--font-display);
+  font-size:.78rem;
+  letter-spacing:1.4px;
+  text-transform:uppercase;
+  color:var(--gold,#C4A347);
+  text-align:center;
+  margin-bottom:18px;
+}
+/* D — static-frame: stage holds a stable minimum footprint across all 4 steps.
+   min-height derived from Step 3 (treasures) — tallest step on desktop.
+   box-sizing: border-box makes the 24px #senebtyDaily padding budget honest. */
+.senebty-ritual-stage{
+  max-width:520px;
+  margin:0 auto;
+  min-height:480px;
+  box-sizing:border-box;
+}
+/* C — cinematic step: JS fades opacity 0→1; CSS transition animates the motion.
+   Timing mirrors foundation-render.js _stepWithFade() (220ms ease-in-out).
+   display:none steps are excluded from the fade (they're hidden before JS runs). */
+.senebty-ritual-step{
+  background:rgba(242,228,204,.04);
+  border:1px solid rgba(196,163,71,.18);
+  border-radius:14px;
+  padding:24px 20px 20px;
+  margin-bottom:18px;
+  box-sizing:border-box;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .senebty-ritual-step {
+    transition: opacity 220ms ease-in-out;
+  }
+}
+/* B — cinematic title: clamp matches the foundation-copy heading weight. */
+.senebty-ritual-step__title{
+  font-family:var(--font-display);
+  color:var(--gold,#C4A347);
+  margin:0 0 12px;
+  font-size:clamp(1.3rem, 2.5vw, 1.8rem);
+  text-align:center;
+}
+/* A — cinematic copy: clamp(1.15-1.55rem) + line-height 1.8 + center.
+   Color upgraded from muted secondary to sandstone for readability on the
+   dark-background step card (WCAG contrast passes on rgba(242,228,204,.04)). */
+.senebty-ritual-step__copy{
+  color:var(--sandstone,#F2E4CC);
+  font-size:clamp(1.15rem, 1.8vw, 1.55rem);
+  line-height:1.8;
+  text-align:center;
+  margin:0 0 14px;
+}
+.senebty-ritual-power-word{
+  color:var(--bright-gold,#FFD166);
+  font-family:var(--font-display);
+  letter-spacing:1.5px;
+}
+.senebty-treasure-rate-grid{
+  display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0;
+}
+@media (max-width:520px){ .senebty-treasure-rate-grid{ grid-template-columns:1fr; } }
+.senebty-treasure-rate{
+  border:1px solid rgba(196,163,71,.22);
+  border-radius:10px; padding:10px 12px;
+}
+.senebty-treasure-rate legend{
+  font-family:var(--font-display);
+  font-size:.78rem; letter-spacing:.5px;
+  color:var(--gold,#C4A347);
+  padding:0 6px;
+}
+.senebty-treasure-rate button{
+  font-size:1.6rem;
+  width:48px; height:48px;
+  margin:6px 4px 0;
+  background:transparent;
+  border:1px solid rgba(196,163,71,.28);
+  border-radius:8px;
+  color:var(--sandstone,#F2E4CC);
+  cursor:pointer;
+  /* H — prefers-reduced-motion guard (Stage-1 RT finding H). */
+}
+/* H — transition only when motion is welcome. */
+@media (prefers-reduced-motion: no-preference) {
+  .senebty-treasure-rate button {
+    transition: transform 120ms ease, background 120ms ease;
+  }
+}
+.senebty-treasure-rate button[aria-pressed="true"]{
+  background:rgba(196,163,71,.18);
+  border-color:var(--gold,#C4A347);
+  /* Stage-2 Coach: scale up the selected glyph for kinesthetic feedback. */
+  transform: scale(1.15);
+}
+/* Stage-2 Coach: high-contrast OS override for treasure buttons. */
+@media (prefers-contrast: more) {
+  .senebty-treasure-rate button {
+    border-color: currentColor;
+    border-width: 2px;
+  }
+  .senebty-treasure-rate button[aria-pressed="true"] {
+    background: rgba(255,255,255,0.15);
+    outline: 3px solid currentColor;
+  }
+}
+/* Stage-2 Coach: print — hide decorative buttons, show legend only. */
+@media print {
+  .senebty-treasure-rate-grid { display: block; }
+  .senebty-treasure-rate button { display: none; }
+}
+.senebty-ritual-seal-btn{
+  display:block;
+  margin:24px auto 0;
+  /* WCAG 2.2 Target Size: 44×44px floor; ritual seal exceeds (280×64). */
+  min-width:280px; min-height:64px;
+  font-family:var(--font-display);
+  font-size:1.05rem;
+  letter-spacing:1.2px;
+}
+/* Stage-2 Coach: seal-btn needs explicit hover/focus state (Stage-1 finding).
+   The base .btn class provides defaults but ritual seal warrants the same
+   enterprise-CTA treatment as .senebty-ritual-next-btn. */
+.senebty-ritual-seal-btn:hover,
+.senebty-ritual-seal-btn:focus-visible {
+  background: rgba(168, 184, 204, 0.18);
+  border-color: #A8B8CC;
+  color: #A8B8CC;
+  outline: 2px solid #A8B8CC;
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .senebty-ritual-seal-btn {
+    transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+  }
+  .senebty-ritual-seal-btn:hover,
+  .senebty-ritual-seal-btn:focus-visible {
+    transform: translateY(-1px);
+  }
+}
+
+/* ─── Senebty Streak Pause (QA-DA + Tehuti + Parent-Voice bindings) ─── */
+.senebty-streak-pause-modal-overlay{
+  position:fixed; inset:0;
+  background:rgba(17,13,8,.78);
+  display:flex; align-items:center; justify-content:center;
+  z-index:9100;
+}
+.senebty-streak-pause-modal{
+  background:var(--sandstone,#F2E4CC);
+  color:var(--dark-chocolate,#110D08);
+  border:1px solid var(--gold,#C4A347);
+  border-radius:12px;
+  padding:24px 22px 20px;
+  max-width:420px; width:90%;
+}
+.senebty-streak-pause-modal h2{
+  font-family:var(--font-display); margin:0 0 12px;
+  color:var(--lapis,#1a237e);
+}
+.senebty-streak-pause-modal__budget{
+  font-style:italic; color:#444; margin:8px 0 16px;
+}
+.senebty-streak-pause-modal__days{
+  border:none; padding:0; margin:0 0 16px;
+  display:flex; flex-direction:column; gap:8px;
+}
+.senebty-streak-pause-modal__days label{ font-size:.95rem; }
+.senebty-streak-pause-modal__actions{
+  display:flex; gap:10px; justify-content:flex-end;
+}
+.senebty-streak-pause-modal__cancel,
+.senebty-streak-pause-modal__confirm{
+  min-width:100px; min-height:44px;
+}
+.senebty-streak-pause-history{
+  margin-top:16px; padding-top:14px;
+  border-top:1px solid rgba(196,163,71,.18);
+}
+.senebty-streak-pause-history h3{
+  font-family:var(--font-display); font-size:.85rem;
+  color:var(--gold,#C4A347); margin:0 0 8px;
+  letter-spacing:.5px;
+}
+.senebty-streak-pause-history ul{
+  margin:0; padding-left:18px; font-size:.82rem; line-height:1.7;
+  color:var(--text-secondary,#bfb29a);
+}
+
+/* ─── Senebty Heka Phrase Parent Delete (QA-DA + Tehuti + Parent-Voice bindings) ─── */
+.senebty-heka-parent-delete-overlay{
+  position:fixed; inset:0;
+  background:rgba(17,13,8,.78);
+  display:flex; align-items:center; justify-content:center;
+  z-index:9200;
+}
+.senebty-heka-parent-delete-modal{
+  background:var(--sandstone,#F2E4CC);
+  color:var(--dark-chocolate,#110D08);
+  border:1px solid var(--gold,#C4A347);
+  border-radius:12px;
+  padding:24px 22px 20px;
+  max-width:440px; width:90%;
+}
+.senebty-heka-parent-delete-modal h2{
+  font-family:var(--font-display); margin:0 0 12px;
+  color:var(--lapis,#1a237e);
+}
+.senebty-heka-parent-delete-modal label{
+  display:block; margin:14px 0 6px; font-size:.9rem;
+}
+.senebty-heka-parent-delete-modal input[type="password"]{
+  width:100%; padding:8px 10px; min-height:44px;
+  border:1px solid #aaa; border-radius:6px;
+}
+.senebty-heka-parent-delete-error{
+  color:var(--carnelian,#B8412B); font-size:.85rem;
+}
+.senebty-heka-parent-delete-actions{
+  display:flex; gap:10px; justify-content:flex-end; margin-top:16px;
+}
+.senebty-heka-parent-delete-cancel,
+.senebty-heka-parent-delete-confirm{
+  min-width:110px; min-height:44px;
+}
+
+/* ─── Senebty Imhotep's Trials Stub Door (Khepera binding) ─── */
+#imhotepTrials{ padding:32px 20px; }
+.senebty-trials-stage{
+  max-width:520px; margin:0 auto; text-align:center;
+}
+.senebty-trials-door{
+  width:280px; height:380px; margin:0 auto 24px;
+  background:linear-gradient(180deg, #6b5837 0%, #4d3e25 100%);
+  border:3px solid var(--gold, #C4A347);
+  border-radius:8px 8px 4px 4px;
+  position:relative;
+  box-shadow:inset 0 -8px 16px rgba(0,0,0,.4),
+             0 12px 24px rgba(0,0,0,.5);
+}
+.senebty-trials-door--locked{ cursor:not-allowed; opacity:.86; }
+.senebty-trials-door__doorway{
+  position:absolute; inset:18px;
+  background:#1a120a;
+  border-radius:4px;
+  box-shadow:inset 0 4px 12px rgba(0,0,0,.7);
+}
+.senebty-trials-seba{
+  color:var(--gold-bright, #FFD166);
+  font-size:1rem; line-height:1.6;
+  margin:0 0 18px;
+}
+.senebty-trials-cite{
+  color:var(--text-secondary, #bfb29a);
+  font-size:.78rem; line-height:1.55;
+  max-width:480px; margin:0 auto;
+}
+
+/* ─── Four-Treasures Graph (Tehuti a11y binding) ─── */
+.senebty-four-treasures-graph{
+  margin: 16px 0;
+}
+.senebty-four-treasures-graph__canvas{
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  background: var(--sandstone, #F2E4CC);
+  border: 1px solid rgba(196,163,71,.18);
+  border-radius: 8px;
+  padding: 8px;
+}
+.senebty-four-treasures-graph__toggle{
+  margin-top: 8px;
+  min-height: 36px;
+  font-size: 0.78rem;
+}
+.senebty-four-treasures-graph__empty{
+  font-style: italic;
+  color: var(--text-secondary, #bfb29a);
+  padding: 16px;
+  text-align: center;
+}
+.senebty-four-treasures-graph__table{
+  margin-top: 8px;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+.senebty-four-treasures-graph__table th,
+.senebty-four-treasures-graph__table td{
+  padding: 4px 8px;
+  border-bottom: 1px solid rgba(196,163,71,.12);
+  text-align: left;
+}
+@media (prefers-reduced-motion: reduce){
+  .senebty-four-treasures-graph__canvas{
+    animation: none !important;
+    transition: none !important;
+  }
+}
+@media (prefers-contrast: more){
+  .senebty-four-treasures-graph__canvas{
+    border-color: var(--gold-bright, #FFD166);
+    border-width: 2px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v3.48.8 — ENTERPRISE-LEVEL-PLUS sweep (adversarial-RT consensus top-7)
+   Closes the wired-naked-class regression class identified via diff of
+   class="senebty-*" in HTML/lib vs CSS-defined .senebty-* selectors.
+   Covers: parent-dashboard senebty card (29 BEM classes), daily-ritual
+   CTAs, ritual-step per-step accents, sema-host focal frame, treasure-
+   rate focus-visible. Lint test prevents future wired-naked regressions.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ─── Parent-portal Senebty card — base + 28 BEM children ─── */
+.senebty-parent-card {
+  display: block;
+  margin: 1rem 0;
+  padding: 1.25rem 1.25rem 1rem;
+  border: 1px solid var(--gold);
+  border-radius: 0.75rem;
+  background: rgba(196, 163, 71, 0.08);
+  color: var(--sandstone);
+  box-shadow: 0 2px 10px rgba(196, 163, 71, 0.06);
+}
+.senebty-parent-card__title {
+  color: var(--gold);
+  font-size: 1.15rem;
+  margin: 0 0 0.75rem;
+  letter-spacing: 0.02em;
+}
+/* v3.51.66 — daily-ritual opt-out toggle (default ON). */
+.senebty-parent-card__daily-ritual-toggle {
+  margin: 0.25rem 0 0.9rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid rgba(196, 163, 71, 0.2);
+  border-radius: 0.5rem;
+  background: rgba(196, 163, 71, 0.05);
+}
+.senebty-daily-ritual-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-family: var(--font-head, serif);
+  color: var(--gold);
+  font-size: 0.95rem;
+}
+.senebty-daily-ritual-toggle-input {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  accent-color: var(--gold);
+}
+.senebty-daily-ritual-toggle-title { display: inline; }
+.senebty-daily-ritual-toggle-desc {
+  margin: 0.375rem 0 0;
+  font-family: var(--font-body, serif);
+  color: var(--sandstone);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  opacity: 0.85;
+}
+.senebty-parent-card__tier {
+  margin: 0 0 1rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(26, 35, 126, 0.18);
+  border-left: 3px solid var(--bright-gold);
+  border-radius: 0.35rem;
+}
+.senebty-parent-card__tier-name { color: var(--bright-gold); font-weight: 600; font-size: 0.95rem; display: block; }
+.senebty-parent-card__tier-text { color: var(--sandstone); font-size: 0.85rem; opacity: 0.9; display: block; }
+.senebty-parent-card__tier-progress {
+  margin-top: 0.4rem;
+  height: 4px;
+  background: rgba(196, 163, 71, 0.12);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+.senebty-parent-card__tally {
+  display: flex;
+  gap: 1rem;
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  color: var(--sandstone);
+}
+
+/* Subsections: streak-pause / heka / pending / auto-advance */
+.senebty-parent-card__streak-pause,
+.senebty-parent-card__heka,
+.senebty-parent-card__pending,
+.senebty-parent-card__auto-advance-log {
+  margin: 1rem 0 0;
+  padding: 0.75rem 0;
+  border-top: 1px solid rgba(196, 163, 71, 0.18);
+}
+.senebty-parent-card__streak-pause-host,
+.senebty-parent-card__heka-host,
+.senebty-parent-card__pending-host,
+.senebty-parent-card__auto-advance-host,
+.senebty-parent-card__graph-host {
+  /* Hosts are passive containers — provide spacing only. */
+  display: block;
+  margin: 0.5rem 0;
+}
+.senebty-parent-card__streak-pause-status { color: var(--sandstone); font-size: 0.85rem; display: block; margin-bottom: 0.4rem; }
+/* .senebty-parent-card__streak-pause-btn — see v3.51.26 enterprise-audit block below for full rule (WCAG 44px + focus) */
+
+/* Heka phrase rendering — italicized quote with gold accent */
+.senebty-parent-card__heka-empty { color: var(--sandstone); opacity: 0.7; font-style: italic; font-size: 0.85rem; margin: 0; }
+.senebty-parent-card__heka-phrase {
+  color: var(--bright-gold);
+  font-style: italic;
+  font-size: 0.95rem;
+  margin: 0.4rem 0;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--gold);
+}
+.senebty-parent-card__heka-note { color: var(--sandstone); opacity: 0.85; font-size: 0.8rem; margin: 0.25rem 0 0; }
+/* .senebty-parent-card__heka-delete-btn — see v3.51.26 enterprise-audit block below for full rule (WCAG 44px + focus) */
+
+/* Pending confirms */
+.senebty-parent-card__pending-empty { color: var(--sandstone); opacity: 0.7; font-style: italic; font-size: 0.85rem; margin: 0; }
+.senebty-parent-card__pending-row {
+  margin: 0.5rem 0;
+  padding: 0.5rem 0.75rem;
+  background: rgba(196, 163, 71, 0.06);
+  border-left: 3px solid var(--gold);
+  border-radius: 0.35rem;
+}
+.senebty-parent-card__pending-header { color: var(--gold); font-weight: 600; font-size: 0.9rem; margin: 0 0 0.25rem; }
+.senebty-parent-card__pending-detail { color: var(--sandstone); font-size: 0.85rem; margin: 0; }
+.senebty-parent-card__pending-textarea {
+  width: 100%;
+  margin-top: 0.4rem;
+  padding: 0.4rem;
+  background: rgba(17, 13, 8, 0.5);
+  border: 1px solid rgba(196, 163, 71, 0.3);
+  border-radius: 0.35rem;
+  color: var(--sandstone);
+  font-family: inherit;
+  font-size: 0.85rem;
+  resize: vertical;
+  min-height: 60px;
+}
+.senebty-parent-card__pending-textarea:focus-visible {
+  outline: 2px solid var(--bright-gold);
+  outline-offset: 1px;
+  border-color: var(--bright-gold);
+}
+/* .senebty-parent-card__pending-confirm — see v3.51.26 enterprise-audit block below for full rule (WCAG 44px + focus) */
+
+/* Auto-advance log */
+.senebty-parent-card__auto-advance-entry {
+  display: block;
+  padding: 0.25rem 0;
+  color: var(--sandstone);
+  opacity: 0.8;
+  font-size: 0.8rem;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v3.51.26 — Parent dashboard Senebty card enterprise audit
+   Stage-1 RT + Stage-2 Coach fixes:
+   • Card mount opacity-transition (cinematic parity with daily-ritual)
+   • Wedeha-upload-panel-host naked class resolved
+   • WCAG 44×44 touch-targets on all buttons (mobile conversion surface)
+   • Focus-visible + hover states on wedeha + streak-pause + pending CTAs
+   • High-contrast OS mode for parent-card + wedeha panel
+   • @media print for progress-report parents
+   • Responsive stacking for wedeha actions at 480px
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Cinematic card mount — CSS side. JS drives opacity 0→1 via double-rAF
+   matching daily-ritual showStep(). prefers-reduced-motion is handled in JS
+   (instant flip), so this transition is safe to leave always-on here. */
+.senebty-parent-card {
+  transition: opacity 220ms ease-in-out;
+}
+
+/* Wedeha-upload-panel-host — naked class resolved (Stage-1 HIGH) */
+.senebty-wedeha-upload-panel-host {
+  display: block;
+  margin: 0.5rem 0;
+}
+
+/* WCAG 2.2 §2.5.8 Target Size: 44×44px floor on all interactive CTAs.
+   Pending-confirm, streak-pause-btn, heka-delete-btn all failed on mobile. */
+.senebty-parent-card__pending-confirm {
+  font-size: 0.85rem;
+  padding: 0.6rem 1rem;
+  margin-top: 0.4rem;
+  min-height: 44px;
+  min-width: 100px;
+}
+.senebty-parent-card__streak-pause-btn {
+  font-size: 0.85rem;
+  padding: 0.6rem 1rem;
+  min-height: 44px;
+}
+.senebty-parent-card__heka-delete-btn {
+  font-size: 0.8rem;
+  padding: 0.5rem 0.85rem;
+  min-height: 44px;
+  opacity: 0.7;
+}
+.senebty-parent-card__heka-delete-btn:hover,
+.senebty-parent-card__heka-delete-btn:focus-visible { opacity: 1; }
+
+/* Focus-visible states on wedeha CTAs (previously unstyled — Maya Stage-1 HIGH) */
+.senebty-wedeha-upload-panel__choose:hover,
+.senebty-wedeha-upload-panel__choose:focus-visible {
+  background: rgba(196,163,71,0.30);
+  border-color: var(--bright-gold);
+  color: var(--bright-gold);
+  outline: 2px solid var(--bright-gold);
+  outline-offset: 2px;
+  transform: translateY(-1px);
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+.senebty-wedeha-upload-panel__confirm:hover,
+.senebty-wedeha-upload-panel__confirm:focus-visible {
+  background: rgba(46,125,50,0.35);
+  border-color: #6FBE73;
+  outline: 2px solid #6FBE73;
+  outline-offset: 2px;
+  transition: background 180ms ease;
+}
+.senebty-wedeha-upload-panel__retake:hover,
+.senebty-wedeha-upload-panel__retake:focus-visible {
+  border-color: var(--gold);
+  color: var(--gold);
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  transition: border-color 180ms ease;
+}
+/* Touch-target floors on wedeha action buttons */
+.senebty-wedeha-upload-panel__choose,
+.senebty-wedeha-upload-panel__confirm,
+.senebty-wedeha-upload-panel__retake {
+  min-height: 44px;
+}
+
+/* High-contrast OS mode — parent card + wedeha panel (Stage-2 Coach) */
+@media (prefers-contrast: more) {
+  .senebty-parent-card {
+    border-color: var(--bright-gold);
+    border-width: 2px;
+    background: rgba(196,163,71,0.15);
+  }
+  .senebty-parent-card__tier {
+    border-left-width: 4px;
+  }
+  .senebty-parent-card__pending-row {
+    border-left-width: 4px;
+  }
+  .senebty-parent-card__heka-phrase {
+    border-left-width: 3px;
+  }
+  .senebty-parent-card__pending-textarea:focus-visible {
+    outline-width: 3px;
+  }
+  .senebty-wedeha-upload-panel {
+    border-color: var(--bright-gold);
+    border-width: 2px;
+    background: rgba(196,163,71,0.15);
+  }
+  .senebty-wedeha-upload-panel__confirm {
+    color: #8FDE93;
+    border-color: #8FDE93;
+  }
+}
+
+/* Mobile — responsive stacking (Stage-2 Coach: phone is most common access) */
+@media (max-width: 480px) {
+  .senebty-parent-card {
+    padding: 1rem 0.9rem 0.85rem;
+  }
+  .senebty-wedeha-upload-panel__actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .senebty-wedeha-upload-panel__confirm,
+  .senebty-wedeha-upload-panel__retake {
+    width: 100%;
+  }
+  .senebty-parent-card__pending-confirm,
+  .senebty-parent-card__streak-pause-btn {
+    width: 100%;
+  }
+  .senebty-parent-card__tally {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
+/* Print stylesheet — parents print progress reports (Stage-2 Coach) */
+@media print {
+  .senebty-parent-card {
+    border: 1px solid #C4A347;
+    background: #fff;
+    color: #1a1208;
+    box-shadow: none;
+    break-inside: avoid;
+  }
+  .senebty-parent-card__title {
+    color: #8a7030;
+  }
+  .senebty-parent-card__tier {
+    background: #f8f4e8;
+    border-left: 3px solid #C4A347;
+  }
+  .senebty-parent-card__tier-name {
+    color: #8a7030;
+  }
+  .senebty-parent-card__tier-text {
+    color: #3a2e1f;
+    opacity: 1;
+  }
+  .senebty-parent-card__tally {
+    color: #3a2e1f;
+  }
+  .senebty-parent-card__streak-pause-status {
+    color: #3a2e1f;
+  }
+  .senebty-parent-card__heka-phrase {
+    color: #5a4010;
+    border-left-color: #C4A347;
+  }
+  .senebty-parent-card__heka-note {
+    color: #3a2e1f;
+    opacity: 1;
+  }
+  /* Hide interactive controls — print is read-only */
+  .senebty-parent-card__streak-pause-btn,
+  .senebty-parent-card__heka-delete-btn,
+  .senebty-parent-card__pending-textarea,
+  .senebty-parent-card__pending-confirm,
+  .senebty-wedeha-upload-panel,
+  .senebty-four-treasures-graph__toggle {
+    display: none !important;
+  }
+  .senebty-parent-card__pending-empty {
+    color: #3a2e1f;
+    opacity: 1;
+    font-style: normal;
+  }
+  .senebty-parent-card__auto-advance-entry {
+    color: #3a2e1f;
+    font-family: sans-serif;
+    opacity: 1;
+  }
+}
+
+/* ─── Daily ritual CTAs — enterprise CTA treatment ─── */
+.senebty-ritual-next-btn,
+.senebty-ritual-record-btn {
+  background: rgba(196, 163, 71, 0.12);
+  border: 1px solid var(--gold);
+  border-radius: 0.5rem;
+  color: var(--gold);
+  padding: 0.55rem 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  margin-top: 0.75rem;
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+.senebty-ritual-next-btn:hover,
+.senebty-ritual-next-btn:focus-visible,
+.senebty-ritual-record-btn:hover,
+.senebty-ritual-record-btn:focus-visible {
+  background: rgba(196, 163, 71, 0.22);
+  border-color: var(--bright-gold);
+  color: var(--bright-gold);
+  transform: translateY(-1px);
+  outline: 2px solid var(--bright-gold);
+  outline-offset: 2px;
+}
+/* Begin-recitation gets carnelian iri-distinction — it IS the iri (Hilliard) */
+.senebty-ritual-record-btn {
+  border-color: var(--carnelian);
+  color: var(--carnelian);
+  background: rgba(184, 65, 43, 0.12);
+}
+.senebty-ritual-record-btn:hover,
+.senebty-ritual-record-btn:focus-visible {
+  border-color: #D85838;
+  color: #D85838;
+  background: rgba(184, 65, 43, 0.22);
+  outline-color: #D85838;
+}
+
+/* ─── Daily ritual step per-step series-accent (Mahlangu binding) ─── */
+.senebty-ritual-step--sema {
+  border-left: 3px solid var(--lapis);
+  padding-left: 1rem;
+}
+.senebty-ritual-step--word {
+  border-left: 3px solid var(--bright-gold);
+  padding-left: 1rem;
+}
+.senebty-ritual-step--treasures {
+  /* 4-color progression strip — one stripe per treasure (khat/ib/ka/ba) */
+  border-left: 3px solid var(--carnelian);
+  padding-left: 1rem;
+  background: linear-gradient(
+    to bottom,
+    var(--carnelian) 0%, var(--carnelian) 25%,
+    var(--malachite) 25%, var(--malachite) 50%,
+    var(--gold) 50%, var(--gold) 75%,
+    var(--bright-gold) 75%, var(--bright-gold) 100%
+  ) left / 3px 100% no-repeat;
+  border-left: none;
+}
+.senebty-ritual-step--seal {
+  border-left: 3px solid #A8B8CC; /* pale-lapis-silver = gate-closing */
+  padding-left: 1rem;
+}
+
+/* ─── Sema host focal frame (Biggers — the practice instrument has a home) ─── */
+.senebty-ritual-sema-host {
+  display: block;
+  margin: 0.75rem 0;
+  padding: 1rem;
+  background: rgba(26, 35, 126, 0.10);
+  border: 1px solid rgba(168, 184, 204, 0.35);
+  border-radius: 0.5rem;
+  text-align: center;
+  min-height: 80px;
+}
+
+/* ─── Treasure-rate fieldset focus-visible (Maya a11y binding) ─── */
+.senebty-treasure-rate button:focus-visible {
+  outline: 2px solid var(--bright-gold);
+  outline-offset: 2px;
+  background: rgba(255, 209, 102, 0.18);
+}
+
+/* ─── Foundation-render chunk-reading UI (senebty-fc-*) ───
+   The entire chunk-reading + MCQ surface across all 7 foundations.
+   Rendered by senebty/lib/foundation-render.js. Previously unstyled
+   (browser defaults). The chunk image gets a framed card; the lapis-field
+   fallback gets a radial gradient with optional glyph centered. */
+.senebty-fc-art {
+  display: block;
+  width: 100%;
+  /* v3.51.9 — picture-book hero: art fills the stage width (max 1100px),
+     16:9 aspect-ratio holds. On 1080p this is ~1000×563px — prominent
+     without dominating. Mobile (clamp lower bound) scales to viewport. */
+  max-width: clamp(320px, 90vw, 1100px);
+  margin: 0 auto;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--gold);
+  border-radius: clamp(0.75rem, 1.5vw, 1rem);
+  overflow: hidden;
+  background: rgba(26, 35, 126, 0.18);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+.senebty-fc-art-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* v3.51.0 — Veo ritual video. Mirrors .senebty-fc-art-img geometry so the
+   16:9 framed slot fills identically whether video or still is active. */
+.senebty-fc-art-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.senebty-fc-art-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at center,
+    rgba(26, 35, 126, 0.95) 0%,
+    rgba(17, 13, 8, 0.95) 100%);
+}
+.senebty-fc-art-glyph {
+  font-size: clamp(3rem, 8vw, 5rem);
+  color: var(--gold);
+  text-shadow: 0 2px 12px rgba(196, 163, 71, 0.4);
+  line-height: 1;
+}
+
+.senebty-fc-mcq {
+  display: block;
+  margin: 1.25rem auto;
+  max-width: 640px;
+  padding: 1rem 1.25rem;
+  background: rgba(26, 35, 126, 0.12);
+  border: 1px solid rgba(196, 163, 71, 0.35);
+  border-radius: 0.75rem;
+}
+.senebty-fc-mcq-q {
+  color: var(--bright-gold);
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+  line-height: 1.4;
+}
+.senebty-fc-mcq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.senebty-fc-mcq-option {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  text-align: left;
+  background: rgba(196, 163, 71, 0.08);
+  border: 1px solid var(--gold);
+  border-radius: 0.5rem;
+  color: var(--sandstone);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+.senebty-fc-mcq-option:hover:not(:disabled),
+.senebty-fc-mcq-option:focus-visible:not(:disabled) {
+  background: rgba(196, 163, 71, 0.18);
+  border-color: var(--bright-gold);
+  transform: translateX(2px);
+  outline: 2px solid var(--bright-gold);
+  outline-offset: 2px;
+}
+.senebty-fc-mcq-option:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+.senebty-fc-mcq-correct {
+  background: rgba(46, 125, 50, 0.22) !important;
+  border-color: var(--malachite) !important;
+  color: var(--sandstone);
+}
+.senebty-fc-mcq-correct::after {
+  content: ' ✓';
+  color: var(--malachite);
+  font-weight: 700;
+}
+.senebty-fc-mcq-wrong {
+  background: rgba(184, 65, 43, 0.18) !important;
+  border-color: var(--carnelian) !important;
+}
+.senebty-fc-mcq-wrong::after {
+  content: ' ✗';
+  color: var(--carnelian);
+  font-weight: 700;
+}
+.senebty-fc-mcq-feedback {
+  margin: 0.75rem 0 0;
+  color: var(--sandstone);
+  font-size: 0.9rem;
+  font-style: italic;
+  opacity: 0.95;
+  min-height: 1.25rem;
+}
+
+/* ─── Heka phrase composition modal (F8 climax) ───
+   Renders when child + parent compose the personal Heka phrase at end of F8.
+   Previously unstyled — modal opened with browser-default white card on the
+   lapis backdrop. Now matched to the tier-modal design language. */
+.senebty-heka-compose-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(17, 13, 8, 0.82); /* opacity raised from 0.75 to 0.82 to compensate for removed backdrop-filter */
+  /* backdrop-filter removed — banned by project rule (feTurbulence / backdrop-filter crash Chrome GPU) */
+  z-index: 1000;
+}
+.senebty-heka-compose-modal {
+  width: 100%;
+  max-width: 480px;
+  padding: 1.5rem 1.5rem 1.25rem;
+  background: linear-gradient(180deg, rgba(26, 35, 126, 0.95) 0%, rgba(17, 13, 8, 0.95) 100%);
+  border: 1px solid var(--bright-gold);
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  color: var(--sandstone);
+}
+.senebty-heka-compose-heading {
+  color: var(--bright-gold);
+  font-size: 1.3rem;
+  margin: 0 0 0.4rem;
+  letter-spacing: 0.02em;
+}
+.senebty-heka-compose-sub {
+  color: var(--gold);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin: 0 0 0.85rem;
+  opacity: 0.95;
+}
+.senebty-heka-compose-intro {
+  color: var(--sandstone);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0 0 1rem;
+}
+.senebty-heka-compose-textarea {
+  width: 100%;
+  min-height: 90px;
+  padding: 0.6rem 0.75rem;
+  background: rgba(17, 13, 8, 0.55);
+  border: 1px solid var(--gold);
+  border-radius: 0.5rem;
+  color: var(--sandstone);
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.45;
+  resize: vertical;
+}
+.senebty-heka-compose-textarea:focus-visible {
+  outline: 2px solid var(--bright-gold);
+  outline-offset: 1px;
+  border-color: var(--bright-gold);
+}
+.senebty-heka-compose-counter {
+  display: block;
+  margin: 0.35rem 0 0;
+  text-align: right;
+  font-size: 0.8rem;
+  color: var(--sandstone);
+  opacity: 0.75;
+}
+.senebty-heka-compose-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+.senebty-heka-compose-save,
+.senebty-heka-compose-cancel {
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+.senebty-heka-compose-save {
+  background: rgba(255, 209, 102, 0.18);
+  border: 1px solid var(--bright-gold);
+  color: var(--bright-gold);
+}
+.senebty-heka-compose-save:hover,
+.senebty-heka-compose-save:focus-visible {
+  background: rgba(255, 209, 102, 0.30);
+  transform: translateY(-1px);
+  outline: 2px solid var(--bright-gold);
+  outline-offset: 2px;
+}
+.senebty-heka-compose-cancel {
+  background: transparent;
+  border: 1px solid rgba(196, 163, 71, 0.55);
+  color: var(--sandstone);
+  opacity: 0.85;
+}
+.senebty-heka-compose-cancel:hover,
+.senebty-heka-compose-cancel:focus-visible {
+  opacity: 1;
+  border-color: var(--gold);
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ─── Miscellaneous wired-naked classes (one-off) ─── */
+.senebty-heka-parent-pin {
+  width: 100%;
+  max-width: 120px;
+  padding: 0.4rem;
+  text-align: center;
+  letter-spacing: 0.3em;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 1.1rem;
+  background: rgba(17, 13, 8, 0.5);
+  border: 1px solid var(--gold);
+  border-radius: 0.35rem;
+  color: var(--bright-gold);
+}
+.senebty-heka-parent-pin:focus-visible {
+  outline: 2px solid var(--bright-gold);
+  outline-offset: 1px;
+}
+.senebty-streak-pause-days {
+  color: var(--bright-gold);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+.senebty-tier-modal-title {
+  /* Inside the tier modal — the .senebty-tier-modal__title BEM is styled but
+     this BIM-less alias is used by lib/render.js. Mirror the styled rule. */
+  color: var(--bright-gold);
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  text-align: center;
+}
+.senebty-tier-sigil-fallback {
+  display: inline-block;
+  color: var(--gold);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+.senebty-glossary {
+  /* Glossary toggle host — minimal styling, the inner UI is its own component. */
+  display: inline-block;
+}
+.senebty-glossary-open {
+  /* State-class added when glossary panel is open — pairs with the backdrop. */
+  cursor: pointer;
+}
+
+/* ─── F5 consent dialog modal (v3.50.0) ─── */
+.senebty-consent-overlay {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  background: rgba(17, 13, 8, 0.75);
+  z-index: 1000;
+}
+.senebty-consent-modal {
+  width: 100%; max-width: 480px;
+  padding: 1.5rem 1.5rem 1.25rem;
+  background: linear-gradient(180deg, rgba(26,35,126,0.95) 0%, rgba(17,13,8,0.95) 100%);
+  border: 1px solid var(--bright-gold);
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  color: var(--sandstone);
+}
+.senebty-consent-heading {
+  color: var(--bright-gold); font-size: 1.3rem; margin: 0 0 0.5rem;
+}
+.senebty-consent-copy { color: var(--sandstone); font-size: 0.95rem; line-height: 1.55; margin: 0 0 0.85rem; }
+.senebty-consent-policy-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: var(--gold); font-size: 0.85rem; text-decoration: underline;
+}
+.senebty-consent-actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
+.senebty-consent-consent,
+.senebty-consent-not-now {
+  padding: 0.5rem 1.25rem; border-radius: 0.5rem;
+  font-weight: 600; letter-spacing: 0.02em; cursor: pointer;
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+.senebty-consent-consent {
+  background: rgba(255,209,102,0.18); border: 1px solid var(--bright-gold); color: var(--bright-gold);
+}
+.senebty-consent-consent:hover, .senebty-consent-consent:focus-visible {
+  background: rgba(255,209,102,0.30); transform: translateY(-1px);
+  outline: 2px solid var(--bright-gold); outline-offset: 2px;
+}
+.senebty-consent-not-now {
+  background: transparent; border: 1px solid rgba(196,163,71,0.55); color: var(--sandstone); opacity: 0.85;
+}
+.senebty-consent-not-now:hover, .senebty-consent-not-now:focus-visible {
+  opacity: 1; border-color: var(--gold);
+  outline: 2px solid var(--gold); outline-offset: 2px;
+}
+
+/* ─── F5 parent dashboard upload panel ─── */
+.senebty-wedeha-upload-panel {
+  margin: 1rem 0; padding: 1rem 1.25rem;
+  border: 1px solid var(--gold); border-radius: 0.75rem;
+  background: rgba(196,163,71,0.08); color: var(--sandstone);
+}
+.senebty-wedeha-upload-panel__title {
+  color: var(--gold); font-size: 1.05rem; margin: 0 0 0.5rem;
+}
+.senebty-wedeha-upload-panel__copy {
+  color: var(--sandstone); font-size: 0.9rem; line-height: 1.5; margin: 0 0 0.85rem;
+}
+.senebty-wedeha-upload-panel__choose {
+  background: rgba(196,163,71,0.18); border: 1px solid var(--gold); color: var(--gold);
+  padding: 0.5rem 1.25rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600;
+}
+.senebty-wedeha-upload-panel__progress {
+  width: 100%; height: 6px; background: rgba(196,163,71,0.18); border-radius: 3px; overflow: hidden;
+  margin: 0.5rem 0;
+}
+.senebty-wedeha-upload-panel__progress-bar {
+  height: 100%; background: var(--bright-gold); width: 0%; transition: width 180ms linear;
+}
+.senebty-wedeha-upload-panel__thumbnail {
+  max-width: 320px; max-height: 240px; border: 1px solid var(--gold); border-radius: 0.5rem;
+  margin: 0.5rem 0;
+}
+.senebty-wedeha-upload-panel__actions { display: flex; gap: 0.75rem; margin-top: 0.5rem; }
+.senebty-wedeha-upload-panel__confirm,
+.senebty-wedeha-upload-panel__retake {
+  padding: 0.45rem 1rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer;
+}
+.senebty-wedeha-upload-panel__confirm {
+  background: rgba(46,125,50,0.22); border: 1px solid var(--malachite); color: #6FBE73;
+}
+.senebty-wedeha-upload-panel__retake {
+  background: transparent; border: 1px solid rgba(196,163,71,0.5); color: var(--sandstone);
+}
+.senebty-wedeha-upload-panel__error {
+  color: #D85838; font-size: 0.85rem; margin-top: 0.5rem;
+}
+
+/* ─── v3.51.40 — Senebty Seba pulse + reflection (F1 Mu + F2 Four Treasures)
+   Reader-side parallel: maat-reader.html .comprehension-pulse + .maat-reflection.
+   Senebty palette: parchment cream #F2E4CC bg, earth-brown ink #3A2E1F text,
+   deep-gold #8B6F2C accent (matches the v3.51.38 majestic vocab treatment).
+   WCAG AA verified: #3A2E1F on #F2E4CC = 11.7:1 (AAA); #8B6F2C on #F2E4CC = 4.7:1 (AA).
+
+   Hosts render inside .senebty-foundation-copy (parchment scroll), so they
+   share the scroll's footprint. Per Coach #5 / Coach #6 carry-forward
+   from MCQ retheme. */
+
+.senebty-fc-pulse-host,
+.senebty-fc-reflection-host {
+  width: 100%;
+}
+.senebty-fc-pulse {
+  display: block;
+  margin: 0;
+  padding: 1rem 0.25rem;
+  background: transparent;
+  border: none;
+  text-align: left;
+}
+.senebty-fc-pulse-label {
+  font-family: var(--font-head, 'Cinzel', Georgia, serif);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #8B6F2C;
+  margin-bottom: 0.5rem;
+}
+.senebty-fc-pulse-q {
+  font-family: var(--font-body, 'Bitter', serif);
+  font-size: 1.05rem;
+  color: #2A1F12;
+  margin: 0 0 0.85rem;
+  line-height: 1.5;
+  font-weight: 600;
+}
+.senebty-fc-pulse-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.senebty-fc-pulse-option {
+  min-height: 44px;
+  padding: 0.65rem 0.9rem;
+  text-align: left;
+  background: rgba(108, 78, 42, 0.08);
+  border: 1px solid rgba(108, 78, 42, 0.45);
+  border-radius: 0.5rem;
+  color: #3A2E1F;
+  font-family: var(--font-body, 'Bitter', serif);
+  font-size: 0.98rem;
+  cursor: pointer;
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+.senebty-fc-pulse-option:hover:not(:disabled),
+.senebty-fc-pulse-option:focus-visible:not(:disabled) {
+  background: rgba(108, 78, 42, 0.16);
+  border-color: #8B6F2C;
+  color: #2A1F12;
+  transform: translateX(2px);
+  outline: 2px solid #8B6F2C;
+  outline-offset: 2px;
+}
+.senebty-fc-pulse-option:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+.senebty-fc-pulse-correct {
+  background: rgba(46, 125, 50, 0.20) !important;
+  border-color: #2E7D32 !important;
+  color: #1F4A24 !important;
+}
+.senebty-fc-pulse-correct::after {
+  content: ' \2713';
+  color: #2E7D32;
+  font-weight: 700;
+}
+.senebty-fc-pulse-wrong {
+  background: rgba(184, 65, 43, 0.18) !important;
+  border-color: #B8412B !important;
+  color: #6E2614 !important;
+}
+.senebty-fc-pulse-wrong::after {
+  content: ' \2717';
+  color: #B8412B;
+  font-weight: 700;
+}
+.senebty-fc-pulse-feedback {
+  margin: 0.75rem 0 0;
+  color: #3A2E1F;
+  font-family: var(--font-body, 'Bitter', serif);
+  font-size: 0.9rem;
+  font-style: italic;
+  min-height: 1.25rem;
+}
+.senebty-fc-pulse-feedback:empty {
+  margin: 0;
+}
+
+/* End-of-foundation Sunu / Aset reflection card */
+.senebty-fc-reflection {
+  display: block;
+  padding: 0.5rem 0.25rem 0.75rem;
+}
+.senebty-fc-reflection-label {
+  font-family: var(--font-display, 'Cinzel Decorative', Georgia, serif);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: #8B6F2C;
+  font-size: 1.05rem;
+  margin: 0.85rem 0 0.5rem;
+  text-shadow:
+    0 1px 0 rgba(255, 215, 120, 0.6),
+    0 -1px 0 rgba(92, 65, 25, 0.5);
+}
+.senebty-fc-reflection-prompt {
+  font-family: var(--font-body, 'Bitter', serif);
+  font-size: 1.05rem;
+  color: #2A1F12;
+  line-height: 1.55;
+  margin: 0 0 0.85rem;
+  font-style: italic;
+}
+.senebty-fc-reflection-textarea {
+  width: 100%;
+  min-height: 110px;
+  padding: 0.65rem 0.8rem;
+  background: rgba(255, 250, 240, 0.85);
+  border: 1px solid rgba(108, 78, 42, 0.55);
+  border-radius: 0.5rem;
+  color: #2A1F12;
+  font-family: var(--font-body, 'Bitter', serif);
+  font-size: 1rem;
+  line-height: 1.5;
+  resize: vertical;
+  box-sizing: border-box;
+}
+.senebty-fc-reflection-textarea:focus-visible {
+  outline: 2px solid #8B6F2C;
+  outline-offset: 1px;
+  border-color: #8B6F2C;
+}
+.senebty-fc-reflection-wordcount {
+  font-family: var(--font-body, 'Bitter', serif);
+  font-size: 0.78rem;
+  color: #6C4E2A;
+  text-align: right;
+  margin-top: 0.3rem;
+  min-height: 1rem;
+}
+.senebty-fc-reflection-submit {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.85rem;
+}
+.senebty-fc-reflection-btn {
+  min-height: 44px;
+  padding: 0.65rem 1.5rem;
+  background: linear-gradient(180deg, #E8D5AC 0%, #D6BE8C 100%);
+  border: 1px solid #8B6F2C;
+  border-radius: 999px;
+  color: #2A1F12;
+  font-family: var(--font-head, 'Cinzel', Georgia, serif);
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 180ms ease, transform 100ms ease;
+}
+.senebty-fc-reflection-btn:hover:not(:disabled),
+.senebty-fc-reflection-btn:focus-visible:not(:disabled) {
+  background: linear-gradient(180deg, #D6BE8C 0%, #C4A773 100%);
+  outline: 2px solid #8B6F2C;
+  outline-offset: 2px;
+}
+.senebty-fc-reflection-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.senebty-fc-reflection-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+.senebty-fc-reflection-reply {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  background: rgba(255, 250, 240, 0.6);
+  border-left: 3px solid #8B6F2C;
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: #2A1F12;
+  font-family: var(--font-body, 'Bitter', serif);
+  font-size: 0.98rem;
+  line-height: 1.55;
+  font-style: italic;
+  min-height: 0;
+}
+.senebty-fc-reflection-reply:empty {
+  display: none;
+}
+.senebty-fc-reflection-after {
+  margin: 0.5rem 0 0;
+  color: #3A2E1F;
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* Sunu / Aset dialogue bubble at the top of the reflection card */
+.senebty-fc-seba-dialogue {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin: 0 0 1rem;
+}
+.senebty-fc-seba-avatar {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #E8D5AC 0%, #C4A773 100%);
+  border: 2px solid #8B6F2C;
+  color: #2A1F12;
+  font-size: 1.3rem;
+  line-height: 1;
+}
+.senebty-fc-seba-bubble {
+  flex: 1 1 auto;
+  padding: 0.6rem 0.85rem;
+  background: rgba(255, 250, 240, 0.75);
+  border: 1px solid rgba(108, 78, 42, 0.45);
+  border-radius: 0.6rem 0.6rem 0.6rem 0.15rem;
+  position: relative;
+}
+.senebty-fc-seba-name {
+  font-family: var(--font-display, 'Cinzel Decorative', Georgia, serif);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: #8B6F2C;
+  margin-bottom: 0.3rem;
+}
+.senebty-fc-seba-intro {
+  margin: 0;
+  font-family: var(--font-body, 'Bitter', serif);
+  font-size: 0.95rem;
+  color: #2A1F12;
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .senebty-fc-pulse-option,
+  .senebty-fc-reflection-btn {
+    transition: none;
+  }
+  .senebty-fc-pulse-option:hover:not(:disabled),
+  .senebty-fc-pulse-option:focus-visible:not(:disabled) {
+    transform: none;
+  }
+  .senebty-fc-reflection-btn:active:not(:disabled) {
+    transform: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .senebty-fc-pulse-label,
+  .senebty-fc-reflection-label,
+  .senebty-fc-seba-name {
+    color: #000;
+    text-shadow: none;
+  }
+  .senebty-fc-pulse-q,
+  .senebty-fc-pulse-feedback,
+  .senebty-fc-pulse-option,
+  .senebty-fc-reflection-prompt,
+  .senebty-fc-reflection-textarea,
+  .senebty-fc-reflection-reply,
+  .senebty-fc-seba-intro {
+    color: #000;
+  }
+  .senebty-fc-pulse-option,
+  .senebty-fc-reflection-textarea,
+  .senebty-fc-reflection-btn,
+  .senebty-fc-seba-bubble,
+  .senebty-fc-seba-avatar {
+    border-color: #000;
+    border-width: 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  .senebty-fc-pulse,
+  .senebty-fc-reflection {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .senebty-fc-seba-dialogue {
+    gap: 0.5rem;
+  }
+  .senebty-fc-seba-avatar {
+    width: 38px;
+    height: 38px;
+    font-size: 1.1rem;
+  }
+}

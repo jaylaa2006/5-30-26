@@ -1,0 +1,245 @@
+#!/usr/bin/env bash
+# Per Ankh Reader — pre-commit hook
+# Enforces .claude/rules/two-stage-qa-protocol.md "mandatory pre-commit
+# verification" binding. Runs the test suites relevant to the files in
+# this commit. Subagents and contributors that try to skip the binding
+# get caught at git-commit time, not at CI-red time.
+#
+# Bypass: set NO_VERIFY=1 in env, or `git commit --no-verify` (per the
+# project rule, only allowed when the user explicitly requests).
+
+set -e
+
+if [ "${NO_VERIFY:-}" = "1" ]; then
+  echo "[pre-commit] NO_VERIFY=1 — skipping mandatory pre-commit verification"
+  exit 0
+fi
+
+changed=$(git diff --cached --name-only --diff-filter=ACMR)
+
+if [ -z "$changed" ]; then
+  exit 0
+fi
+
+# Map changed files to required test suites. Each line: "pattern test_script"
+# Pattern is a substring match against the changed file path.
+run_tests=()
+add_test() {
+  for t in "${run_tests[@]}"; do
+    if [ "$t" = "$1" ]; then return; fi
+  done
+  run_tests+=("$1")
+}
+
+while IFS= read -r f; do
+  case "$f" in
+    senebty/lib/foundation-render.js|tests/senebty-foundation-render*.test.mjs|tests/senebty-foundation-pulse.test.mjs|tests/senebty-foundation-reflection.test.mjs)
+      add_test "test:senebty-foundation-render"
+      add_test "test:senebty-foundation-render-html-wiring"
+      add_test "test:senebty-foundation-pulse"
+      add_test "test:senebty-foundation-reflection"
+      add_test "test:senebty-class-coverage"
+      ;;
+    senebty/data/foundations/01-mu/story.js|tests/senebty-foundation-mu-data.test.mjs)
+      # F1 Mu story.js changes → run pulse + reflection + F1 data test + screen + html-wiring tests
+      add_test "test:senebty-foundation-pulse"
+      add_test "test:senebty-foundation-reflection"
+      add_test "test:senebty-foundation-mu-data"
+      add_test "test:senebty-daily-foundation-screen"
+      add_test "test:senebty-daily-foundation-html-wiring"
+      ;;
+    senebty/data/foundations/02-four-treasures/story.js|tests/senebty-foundation-four-treasures-data.test.mjs)
+      # F2 Four Treasures story.js changes → run pulse + reflection + F2 data test + screen + html-wiring tests
+      # Stage-2 Coach C3: html-wiring added so installer + load-order
+      # regressions (Rule 6) are caught at commit-time, not at deploy-time.
+      add_test "test:senebty-foundation-pulse"
+      add_test "test:senebty-foundation-reflection"
+      add_test "test:senebty-foundation-four-treasures-data"
+      add_test "test:senebty-daily-foundation-screen"
+      add_test "test:senebty-daily-foundation-html-wiring"
+      ;;
+    senebty/data/foundations/03-tjau/story.js|tests/senebty-foundation-tjau-data.test.mjs)
+      # F3 Tjau story.js changes → run pulse + reflection + F3 data test + screen + html-wiring tests
+      add_test "test:senebty-foundation-pulse"
+      add_test "test:senebty-foundation-reflection"
+      add_test "test:senebty-foundation-tjau-data"
+      add_test "test:senebty-daily-foundation-screen"
+      add_test "test:senebty-daily-foundation-html-wiring"
+      ;;
+    senebty/data/foundations/04-mu-streak/story.js|tests/senebty-foundation-mu-streak-data.test.mjs)
+      # F4 Mu Streak story.js changes → run pulse + reflection + F4 data test + screen + html-wiring tests
+      add_test "test:senebty-foundation-pulse"
+      add_test "test:senebty-foundation-reflection"
+      add_test "test:senebty-foundation-mu-streak-data"
+      add_test "test:senebty-daily-foundation-screen"
+      add_test "test:senebty-daily-foundation-html-wiring"
+      ;;
+    senebty/data/foundations/05-wedeha/story.js|tests/senebty-foundation-wedeha-data.test.mjs)
+      # F5 Wedeha story.js changes → run pulse + reflection + F5 data test + screen + html-wiring tests
+      add_test "test:senebty-foundation-pulse"
+      add_test "test:senebty-foundation-reflection"
+      add_test "test:senebty-foundation-wedeha-data"
+      add_test "test:senebty-daily-foundation-screen"
+      add_test "test:senebty-daily-foundation-html-wiring"
+      ;;
+    senebty/data/foundations/06-hesi/story.js|tests/senebty-foundation-hesi-data.test.mjs)
+      # F6 Hesi story.js changes → run pulse + reflection + F6 data test + screen + html-wiring tests
+      add_test "test:senebty-foundation-pulse"
+      add_test "test:senebty-foundation-reflection"
+      add_test "test:senebty-foundation-hesi-data"
+      add_test "test:senebty-daily-foundation-screen"
+      add_test "test:senebty-daily-foundation-html-wiring"
+      ;;
+    senebty/data/foundations/07-senedjem/story.js|tests/senebty-foundation-senedjem-data.test.mjs)
+      # F7 Senedjem story.js changes → run pulse + reflection + F7 data test + screen + html-wiring tests
+      add_test "test:senebty-foundation-pulse"
+      add_test "test:senebty-foundation-reflection"
+      add_test "test:senebty-foundation-senedjem-data"
+      add_test "test:senebty-daily-foundation-screen"
+      add_test "test:senebty-daily-foundation-html-wiring"
+      ;;
+    senebty/data/foundations/08-heka/story.js|tests/senebty-foundation-heka-data.test.mjs)
+      # F8 Heka story.js changes → run pulse + reflection + F8 data test + screen + html-wiring tests
+      add_test "test:senebty-foundation-pulse"
+      add_test "test:senebty-foundation-reflection"
+      add_test "test:senebty-foundation-heka-data"
+      add_test "test:senebty-daily-foundation-screen"
+      add_test "test:senebty-daily-foundation-html-wiring"
+      ;;
+    senebty/data/foundations/01-mu/*|senebty/data/foundations/02-four-treasures/*)
+      # Other assets (images, etc.) under those dirs still get pulse + reflection
+      add_test "test:senebty-foundation-pulse"
+      add_test "test:senebty-foundation-reflection"
+      ;;
+    senebty/lib/daily-foundation-screen.js|senebty/styles/daily-foundation.css)
+      # daily-foundation engine or CSS changes → run F1-F7 data tests + screen + html-wiring tests
+      # Stage-2 Coach C3: html-wiring added (Rule 6 installer load-order).
+      add_test "test:senebty-foundation-mu-data"
+      add_test "test:senebty-foundation-four-treasures-data"
+      add_test "test:senebty-foundation-tjau-data"
+      add_test "test:senebty-foundation-mu-streak-data"
+      add_test "test:senebty-foundation-wedeha-data"
+      add_test "test:senebty-foundation-hesi-data"
+      add_test "test:senebty-foundation-senedjem-data"
+      add_test "test:senebty-foundation-heka-data"
+      add_test "test:senebty-daily-foundation-screen"
+      add_test "test:senebty-daily-foundation-html-wiring"
+      ;;
+    senebty/lib/parent-dashboard.js|tests/senebty-parent-dashboard*.test.mjs)
+      add_test "test:senebty-parent-dashboard"
+      ;;
+    senebty/lib/daily-ritual.js|tests/senebty-daily-ritual*.test.mjs)
+      add_test "test:senebty-daily-ritual-scaffold"
+      ;;
+    senebty/lib/tier-modal.js|senebty/lib/tiers.js|tests/senebty-tier-modal*.test.mjs)
+      add_test "test:senebty-tier-modal"
+      ;;
+    server.js|tests/auth*.test.mjs)
+      add_test "test:auth-password-reset"
+      add_test "test:auth-funnel-digest"
+      add_test "test:auth-stop-the-bleed"
+      add_test "test:google-oauth-audit"
+      add_test "test:email-capture"
+      add_test "test:speech-token-resilience"
+      add_test "test:yt-dlp-resolver"
+      ;;
+    tests/speech-token-resilience.test.mjs)
+      add_test "test:speech-token-resilience"
+      ;;
+    tests/yt-dlp-resolver.test.mjs)
+      add_test "test:yt-dlp-resolver"
+      ;;
+    tests/google-oauth-audit.test.mjs)
+      add_test "test:google-oauth-audit"
+      ;;
+    emails/*|scripts/send-seba-weekly.mjs|tests/seba-weekly-broadcast.test.mjs)
+      add_test "test:seba-weekly-broadcast"
+      ;;
+    seba-story-api.mjs|tests/seba-output-screen.test.mjs)
+      add_test "test:seba-output-screen"
+      add_test "test:email-capture"
+      add_test "test:seba-sync-merge"
+      # 2026-05-23 DEMETRIS remediation — bounded-retry email send + visibility.
+      add_test "test:email-retry"
+      add_test "test:email-send-retry-wiring"
+      add_test "test:welcome-email-backfill"
+      add_test "test:auth-stop-the-bleed"
+      add_test "test:auth-funnel-digest"
+      # v3.51.73 — Response Log content discipline (insertReflection guard +
+      # weekly-email filter); maat-reader.html branch below adds the
+      # client-side coverage.
+      add_test "test:response-log-content-discipline"
+      ;;
+    lib/email-retry.mjs|tests/email-retry.test.mjs|tests/email-send-retry-wiring.test.mjs)
+      add_test "test:email-retry"
+      add_test "test:email-send-retry-wiring"
+      ;;
+    lib/merge-user-data.mjs|tests/seba-sync-merge.test.mjs)
+      add_test "test:seba-sync-merge"
+      ;;
+    # v3.51.74 — SW deploy-path discipline. server.js or sw.js touched →
+    # run the shadow-path contract test (catches reinstated dead route +
+    # any new repo-root sw.js + static-mount ordering regression).
+    server.js|public/sw.js|tests/sw-deploy-path.test.mjs)
+      add_test "test:sw-deploy-path"
+      ;;
+    # v3.51.75 — Landing + login bundle (loading state, USE_GOOGLE hint,
+    # role=alert, hero Sign In, register-default, loud catches, auto-scroll).
+    # Triggered on any auth-surface change so the contract holds.
+    server.js|maat-reader.html|tests/landing-login-bundle.test.mjs)
+      add_test "test:landing-login-bundle"
+      ;;
+    # v3.51.76 — Defensive UX + security (U3 show/hide pw, U4 caps-lock,
+    # S2 email char-strip reject, S3 name length cap).
+    server.js|maat-reader.html|tests/landing-login-defensive-bundle.test.mjs)
+      add_test "test:landing-login-defensive-bundle"
+      ;;
+    # v3.51.77 — Audit follow-up bundle (U5 contrast, R2 JWT-on-auth,
+    # M2 GSI-blocked fallback, P3 sample story link).
+    maat-reader.html|tests/landing-login-followup-bundle.test.mjs)
+      add_test "test:landing-login-followup-bundle"
+      ;;
+    # v3.51.78 — Landing SEO bundle (title + meta + h1 + Featured Stories).
+    maat-reader.html|tests/landing-seo-bundle.test.mjs)
+      add_test "test:landing-seo-bundle"
+      ;;
+    senebty/lib/*.js|senebty/styles/senebty.css|tests/senebty-*.test.mjs)
+      add_test "test:senebty-class-coverage"
+      ;;
+    # v3.51.45 — landing-page video efficiency contract. Triggered by any
+    # change touching maat-reader.html (where the IIFE + <video> tags live),
+    # the landing-video re-encode script, posters, or the test itself.
+    maat-reader.html|tests/landing-video-efficiency.test.mjs|scripts/encode-landing-videos.sh|public/images/landing/*)
+      add_test "test:landing-video-efficiency"
+      add_test "test:google-oauth-audit"
+      add_test "test:yw-mobile-scroll"
+      add_test "test:seba-sync-merge"
+      add_test "test:parent-pin-self-heal"
+      # v3.51.73 — Response Log discipline (logResponse callsites +
+      # _fetchServerReflections loud-fail + banner + retry + auth headers).
+      add_test "test:response-log-content-discipline"
+      ;;
+  esac
+done <<< "$changed"
+
+if [ ${#run_tests[@]} -eq 0 ]; then
+  exit 0
+fi
+
+echo "[pre-commit] Running ${#run_tests[@]} test suite(s) before commit:"
+for t in "${run_tests[@]}"; do echo "  - npm run $t"; done
+
+for t in "${run_tests[@]}"; do
+  if ! npm run "$t" --silent > /tmp/pre-commit-test.log 2>&1; then
+    echo "[pre-commit] FAILED: npm run $t"
+    tail -30 /tmp/pre-commit-test.log
+    echo ""
+    echo "[pre-commit] Commit blocked. Fix the failure above or set NO_VERIFY=1"
+    echo "[pre-commit] (per .claude/rules/two-stage-qa-protocol.md mandatory binding)."
+    exit 1
+  fi
+  echo "[pre-commit] OK: npm run $t"
+done
+
+echo "[pre-commit] All required tests passed."
+exit 0

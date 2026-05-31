@@ -1,0 +1,15 @@
+# Reader Starter Kit
+node_modules/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+/data/
+*.db
+*.db-shm
+*.db-wal
+.user-data/
+.auth-data/
+# NOTE: art/ and videos/ ARE tracked here — they hold your example assets.
+# Large generated batches you don't want in git can be added back per-folder.

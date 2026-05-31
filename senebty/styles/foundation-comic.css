@@ -1,0 +1,101 @@
+/* senebty/styles/foundation-comic.css
+ * Comic-page render for senebty foundations (M4 Task 9).
+ * Palette tokens reuse the project gold/lapis/sandstone vars.
+ */
+
+/* ── Art slot — illustration on top, picture-book layout ── */
+.senebty-fc-art {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto 16px;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #0A0806;
+}
+.senebty-fc-art-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Lapis-field fallback — the senebty sema-arena visual primitive. Shown when
+ * the per-chunk render 404s, and as the comprehension-phase anchor. */
+.senebty-fc-art-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 40%, #1a237e 0%, #0A0806 90%);
+}
+.senebty-fc-art-glyph {
+  font-family: 'Noto Sans Egyptian Hieroglyphs', serif;
+  font-size: clamp(2.5rem, 9vw, 4.5rem);
+  color: #C4A347;
+  line-height: 1;
+}
+
+/* ── MCQ comprehension ── */
+.senebty-fc-mcq { display: block; }
+.senebty-fc-mcq-q {
+  font-size: 1.05rem;
+  margin: 0 0 12px;
+  color: var(--sandstone, #F2E4CC);
+}
+.senebty-fc-mcq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.senebty-fc-mcq-option {
+  min-height: 44px;            /* >= 44px hit area — a11y */
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 1rem;
+  border: 2px solid rgba(196, 163, 71, 0.3);
+  border-radius: 6px;
+  background: var(--bg-card, #1a1410);
+  color: var(--sandstone, #F2E4CC);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.senebty-fc-mcq-option:hover:not(:disabled) { border-color: rgba(196, 163, 71, 0.6); }
+.senebty-fc-mcq-option:disabled { cursor: default; }
+.senebty-fc-mcq-option:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.55), 0 0 0 5px rgba(17, 13, 8, 0.6);
+}
+.senebty-fc-mcq-correct {
+  border-color: #2E7D32;
+  background: rgba(46, 125, 50, 0.18);
+}
+.senebty-fc-mcq-correct::after {
+  content: ' \2713';   /* ✓ — non-color correctness signal (WCAG 1.4.1) */
+  color: #2E7D32;
+  font-weight: 700;
+}
+.senebty-fc-mcq-wrong {
+  border-color: #B8412B;
+  background: rgba(184, 65, 43, 0.15);
+}
+.senebty-fc-mcq-wrong::after {
+  content: ' \2717';   /* ✗ — non-color incorrectness signal (WCAG 1.4.1) */
+  color: #B8412B;
+  font-weight: 700;
+}
+
+/* aria-live answer feedback — visible copy + screen-reader announcement
+ * (impl-gate RT binding, Tehuti). Empty until the child answers. */
+.senebty-fc-mcq-feedback {
+  margin: 10px 0 0;
+  font-size: 0.95rem;
+  min-height: 1.2em;
+  color: var(--sandstone, #F2E4CC);
+}
+.senebty-fc-mcq-feedback:empty { margin: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .senebty-fc-mcq-option { transition: none; }
+}

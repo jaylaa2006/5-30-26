@@ -1,0 +1,309 @@
+/* senebty/styles/daily-foundation.css — v3.51.42
+   Daily Foundations ritual flow chrome. 7-step session:
+   greeting → micro → doing Veo → honor check → blessing → done.
+   Cinematic fade between phases; cel-shaded Veo videos.
+   prefers-reduced-motion → instant phase swap, static video frame. */
+
+.senebty-daily-foundation {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #110D08 0%, #1a1510 100%);
+  color: #F2E4CC;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  box-sizing: border-box;
+  text-align: center;
+  font-family: var(--font-body, 'Bitter', serif);
+}
+
+.senebty-df-greeting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  opacity: 0;
+  animation: senebty-df-fade-in 600ms ease-out forwards;
+}
+.senebty-df-greeting__title {
+  font-family: var(--font-display, 'Cinzel Decorative', serif);
+  font-weight: 900;
+  font-size: clamp(1.8rem, 4.5vw, 3rem);
+  color: #C4A347;
+  letter-spacing: 0.06em;
+  text-shadow:
+    0 1px 0 rgba(255, 215, 120, 0.6),
+    0 -1px 0 rgba(92, 65, 25, 0.6),
+    0 0 12px rgba(255, 215, 120, 0.3);
+  margin: 0;
+}
+.senebty-df-greeting__subtitle {
+  font-family: var(--font-head, 'Cinzel', serif);
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  color: #F2E4CC;
+  opacity: 0.85;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+.senebty-df-greeting__subtitle--multiline {
+  white-space: pre-wrap;
+  text-align: left;
+  font-family: var(--font-body, 'Crimson Pro', serif);
+  font-size: clamp(0.95rem, 2.2vw, 1.2rem);
+  line-height: 1.5;
+  letter-spacing: 0;
+  opacity: 0.95;
+  margin: 1rem auto;
+  max-width: 32em;
+}
+.senebty-df-greeting__powerword {
+  font-family: var(--font-display, 'Cinzel Decorative', serif);
+  font-weight: 700;
+  font-size: clamp(2.5rem, 7vw, 4.5rem);
+  color: #FFD166;
+  letter-spacing: 0.12em;
+  text-shadow: 0 0 20px rgba(255, 215, 120, 0.5);
+  margin: 0.5rem 0;
+}
+
+.senebty-df-micro {
+  max-width: min(560px, 90%);
+  padding: 1.75rem 2rem;
+  background: rgba(196, 163, 71, 0.06);
+  border: 1px solid rgba(196, 163, 71, 0.25);
+  border-radius: 0.25rem 0.75rem 0.25rem 0.75rem;
+  opacity: 0;
+  animation: senebty-df-fade-in 600ms ease-out 200ms forwards;
+}
+.senebty-df-micro__scholar {
+  font-family: var(--font-head, 'Cinzel', serif);
+  font-size: 0.85rem;
+  color: #C4A347;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+.senebty-df-micro__quote {
+  font-family: var(--font-body, 'Bitter', serif);
+  font-size: clamp(1rem, 2.3vw, 1.2rem);
+  line-height: 1.7;
+  color: #F2E4CC;
+  font-style: italic;
+  margin: 0;
+}
+
+.senebty-df-gesture {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: min(560px, 90%);
+  opacity: 0;
+  animation: senebty-df-fade-in 600ms ease-out 300ms forwards;
+}
+
+.senebty-df-doing {
+  max-width: min(600px, 95%);
+  aspect-ratio: 16 / 9;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #0d1228;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 48px rgba(196, 163, 71, 0.15);
+  opacity: 0;
+  animation: senebty-df-fade-in 600ms ease-out forwards;
+}
+.senebty-df-doing video,
+.senebty-df-doing img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.senebty-df-honor {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+  min-height: 48px;
+  min-width: 240px;
+  padding: 0.85rem 2.5rem;
+  background: linear-gradient(135deg, #C4A347, #A88630);
+  color: #110D08;
+  font-family: var(--font-head, 'Cinzel', serif);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(196, 163, 71, 0.3);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+.senebty-df-honor:hover,
+.senebty-df-honor:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 215, 120, 0.5);
+  outline: 3px solid #FFD166;
+  outline-offset: 3px;
+}
+.senebty-df-honor:active { transform: translateY(0); }
+
+.senebty-df-blessing {
+  max-width: min(520px, 95%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  opacity: 0;
+  animation: senebty-df-fade-in 600ms ease-out forwards;
+}
+.senebty-df-blessing__video {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 40px rgba(255, 215, 120, 0.4);
+}
+.senebty-df-blessing__video video,
+.senebty-df-blessing__video img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.senebty-df-blessing__line {
+  font-family: var(--font-head, 'Cinzel', serif);
+  font-size: clamp(1.1rem, 2.6vw, 1.4rem);
+  color: #FFD166;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.senebty-df-continue {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 1.5rem;
+  min-height: 44px;
+  min-width: 200px;
+  padding: 0.75rem 2rem;
+  background: transparent;
+  color: #C4A347;
+  font-family: var(--font-head, 'Cinzel', serif);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid #C4A347;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+.senebty-df-continue:hover,
+.senebty-df-continue:focus-visible {
+  background: rgba(196, 163, 71, 0.1);
+  color: #FFD166;
+  border-color: #FFD166;
+  outline: 3px solid #FFD166;
+  outline-offset: 2px;
+}
+
+@keyframes senebty-df-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .senebty-df-greeting,
+  .senebty-df-micro,
+  .senebty-df-gesture,
+  .senebty-df-doing,
+  .senebty-df-blessing {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .senebty-df-honor { transition: none; }
+  .senebty-df-continue { transition: none; }
+}
+
+/* ── F3 breath chamber ─────────────────────────────────────────────── */
+.senebty-df-breath {
+  position: relative;
+  min-height: 360px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border-radius: 14px; overflow: hidden;
+}
+.senebty-df-breath__bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.senebty-df-breath__bg video,
+.senebty-df-breath__bg img,
+.senebty-df-breath__poster { width: 100%; height: 100%; object-fit: cover; }
+.senebty-df-breath__guide {
+  position: relative; z-index: 1;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,209,102,.55), rgba(196,163,71,.15));
+  box-shadow: 0 0 40px rgba(255,209,102,.35);
+  animation: senebty-df-breathe calc(var(--breath-in,4s) + var(--breath-hold,7s) + var(--breath-out,8s)) ease-in-out infinite;
+  will-change: transform;
+}
+.senebty-df-breath__guide--static { animation: none; transform: scale(1); } /* JS-applied companion to the @media (prefers-reduced-motion) block below */
+.senebty-df-breath__phase {
+  position: relative; z-index: 1; margin-top: 18px;
+  color: var(--sandstone, #F2E4CC); font-size: 1.05rem; text-align: center;
+  text-shadow: 0 1px 6px rgba(0,0,0,.6);
+}
+@keyframes senebty-df-breathe {
+  0%   { transform: scale(.75); }
+  21%  { transform: scale(1.25); }
+  58%  { transform: scale(1.25); }
+  100% { transform: scale(.75); }
+}
+
+/* ── F6 voice demo ─────────────────────────────────────────────────── */
+.senebty-df-voicedemo { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 18px; }
+.senebty-df-voicedemo__viz {
+  width: 220px; height: 64px; border-radius: 10px;
+  background: linear-gradient(90deg, rgba(196,163,71,.15), rgba(255,209,102,.35), rgba(196,163,71,.15));
+}
+.senebty-df-voicedemo__viz.is-playing { animation: senebty-df-pulse 1.2s ease-in-out infinite; }
+.senebty-df-voicedemo__viz--static { animation: none !important; }
+@keyframes senebty-df-pulse { 0%,100% { opacity: .6; } 50% { opacity: 1; } }
+.senebty-df-voicedemo__play {
+  min-height: 48px; padding: 0 22px; border: none; border-radius: 24px; cursor: pointer;
+  background: var(--gold, #C4A347); color: var(--dark-choc, #110D08); font-weight: 700; font-size: 1rem;
+}
+.senebty-df-voicedemo__play:hover, .senebty-df-voicedemo__play:focus-visible { filter: brightness(1.08); outline: 3px solid var(--bright-gold, #FFD166); outline-offset: 2px; }
+.senebty-df-voicedemo__affirm { color: var(--bright-gold, #FFD166); font-size: 1.1rem; text-align: center; }
+
+/* ── F8 affirmation chooser ────────────────────────────────────────── */
+.senebty-df-affirm { display: flex; flex-direction: column; gap: 14px; padding: 18px; max-width: 640px; margin: 0 auto; }
+.senebty-df-affirm__prev { color: var(--bright-gold, #FFD166); font-style: italic; }
+.senebty-df-affirm__prompt { color: var(--sandstone, #F2E4CC); font-size: 1.05rem; }
+.senebty-df-affirm__status { color: var(--bright-gold, #FFD166); min-height: 1.2em; font-weight: 600; }
+.senebty-df-affirm__choices { display: flex; flex-direction: column; gap: 10px; }
+.senebty-df-affirm__choice {
+  min-height: 48px; padding: 12px 16px; text-align: left; cursor: pointer;
+  border: 1px solid rgba(196,163,71,.5); border-radius: 10px;
+  background: rgba(26,35,126,.25); color: var(--sandstone, #F2E4CC); font-size: 1.02rem; line-height: 1.4;
+}
+.senebty-df-affirm__choice:hover, .senebty-df-affirm__choice:focus-visible { border-color: var(--gold, #C4A347); background: rgba(26,35,126,.45); outline: 3px solid var(--bright-gold, #FFD166); outline-offset: 2px; }
+.senebty-df-affirm__input {
+  min-height: 48px; padding: 10px 14px; border-radius: 10px;
+  border: 1px solid rgba(196,163,71,.5); background: rgba(0,0,0,.25); color: var(--sandstone, #F2E4CC); font-size: 1rem;
+}
+.senebty-df-affirm__save {
+  min-height: 48px; padding: 0 22px; border: none; border-radius: 24px; cursor: pointer;
+  background: var(--gold, #C4A347); color: var(--dark-choc, #110D08); font-weight: 700; align-self: flex-start;
+}
+.senebty-df-affirm__save:hover, .senebty-df-affirm__save:focus-visible {
+  filter: brightness(1.08); outline: 3px solid var(--bright-gold, #FFD166); outline-offset: 2px;
+}
+
+/* reduced-motion: freeze the breathing + voice viz */
+@media (prefers-reduced-motion: reduce) {
+  .senebty-df-breath__guide { animation: none; transform: scale(1); }
+  .senebty-df-voicedemo__viz { animation: none !important; }
+}
